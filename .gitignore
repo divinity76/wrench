@@ -1,9 +1,7 @@
 *.sw[m-p]
-phpunit
-build
-doc/build
+.phpunit.result.cache
+composer.lock
+phpstan.neon
+phpunit.xml
 vendor
-bin
-composer.phar
 examples/generated.pem
-nbproject/*
