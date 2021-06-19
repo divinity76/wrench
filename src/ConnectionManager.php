@@ -8,6 +8,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use Wrench\Application\BinaryDataHandlerInterface;
 use Wrench\Application\ConnectionHandlerInterface;
 use Wrench\Application\DataHandlerInterface;
 use Wrench\Application\UpdateHandlerInterface;
@@ -41,23 +42,17 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * An array of client connections.
      *
-     * @var array<int => Connection>
+     * @var array<int, Connection>
      */
     protected $connections = [];
 
     /**
      * An array of raw socket resources, corresponding to connections, roughly.
      *
-     * @var array<int => resource>
+     * @var array<int, resource>
      */
     protected $resources = [];
 
-    /**
-     * Constructor.
-     *
-     * @param Server $server
-     * @param array  $options
-     */
     public function __construct(Server $server, array $options = [])
     {
         $this->logger = new NullLogger();
@@ -77,11 +72,9 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * Gets the application associated with the given path.
      *
-     * @param string $path
-     *
-     * @return DataHandlerInterface|ConnectionHandlerInterface|UpdateHandlerInterface
+     * @return BinaryDataHandlerInterface|ConnectionHandlerInterface|DataHandlerInterface|UpdateHandlerInterface|null
      */
-    public function getApplicationForPath($path)
+    public function getApplicationForPath(string $path)
     {
         $path = \ltrim($path, '/');
 
@@ -159,7 +152,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      *
      * @param resource $resource A socket resource
      *
-     * @return Connection|LoggerAwareInterface
+     * @return Connection
      */
     protected function createConnection($resource): Connection
     {
@@ -201,7 +194,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      */
     protected function resourceId($resource): int
     {
-        return (int) $resource;
+        return \get_resource_id($resource);
     }
 
     /**
@@ -246,15 +239,11 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      *
      * @param resource $socket
      *
-     * @return Connection
+     * @return Connection|null
      */
     protected function getConnectionForClientSocket($socket): ?Connection
     {
-        if (!isset($this->connections[$this->resourceId($socket)])) {
-            return null;
-        }
-
-        return $this->connections[$this->resourceId($socket)];
+        return $this->connections[$this->resourceId($socket)] ?? null;
     }
 
     /**
@@ -340,7 +329,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * Gets all resources.
      *
-     * @return array<int => resource)
+     * @return array<int, resource>
      */
     protected function getAllResources(): array
     {

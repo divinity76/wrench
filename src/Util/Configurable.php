@@ -22,16 +22,13 @@ abstract class Configurable
     protected $protocol;
 
     /**
-     * Configurable constructor.
-     *
      * @param array $options (optional)
      *                       Options:
      *                       - protocol             => Wrench\Protocol object, latest protocol
      *                       version used if not specified
      */
-    public function __construct(
-        array $options = []
-    ) {
+    public function __construct(array $options = [])
+    {
         $this->configure($options);
         $this->configureProtocol();
     }

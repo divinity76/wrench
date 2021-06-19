@@ -14,7 +14,7 @@ use Wrench\Payload\Payload;
  */
 abstract class Protocol
 {
-    /**#@+
+    /**
      * Relevant schemes
      *
      * @var string
@@ -23,9 +23,8 @@ abstract class Protocol
     public const SCHEME_WEBSOCKET_SECURE = 'wss';
     public const SCHEME_UNDERLYING = 'tcp';
     public const SCHEME_UNDERLYING_SECURE = 'tls';
-    /**#@-*/
 
-    /**#@+
+    /**
      * HTTP headers
      *
      * @var string
@@ -39,9 +38,8 @@ abstract class Protocol
     public const HEADER_ORIGIN = 'origin';
     public const HEADER_CONNECTION = 'connection';
     public const HEADER_UPGRADE = 'upgrade';
-    /**#@-*/
 
-    /**#@+
+    /**
      * HTTP error statuses
      *
      * @var int
@@ -54,9 +52,8 @@ abstract class Protocol
     public const HTTP_RATE_LIMITED = 420;
     public const HTTP_SERVER_ERROR = 500;
     public const HTTP_NOT_IMPLEMENTED = 501;
-    /**#@-*/
 
-    /**#@+
+    /**
      * Close statuses
      *
      * @see http://tools.ietf.org/html/rfc6455#section-7.4
@@ -75,9 +72,8 @@ abstract class Protocol
     public const CLOSE_EXTENSION_NEEDED = 1010;
     public const CLOSE_UNEXPECTED = 1011;
     public const CLOSE_RESERVED_TLS = 1015;
-    /**#@-*/
 
-    /**#@+
+    /**
      * Frame types
      *  %x0 denotes a continuation frame
      *  %x1 denotes a text frame
@@ -106,7 +102,6 @@ abstract class Protocol
     public const TYPE_RESERVED_13 = 13;
     public const TYPE_RESERVED_14 = 14;
     public const TYPE_RESERVED_15 = 15;
-    /**#@-*/
 
     /**
      * Magic GUID
@@ -156,10 +151,11 @@ abstract class Protocol
      * @var string printf compatible, passed header name and value
      */
     public const HEADER_LINE_FORMAT = '%s: %s';
+
     /**
      * Close status codes.
      *
-     * @var array<int => string>
+     * @var array<int, string>
      */
     public const CLOSE_REASONS = [
         self::CLOSE_NORMAL => 'normal close',
@@ -176,12 +172,13 @@ abstract class Protocol
         self::CLOSE_RESERVED_ABNORM => null,
         self::CLOSE_RESERVED_TLS => null,
     ];
+
     /**
      * Frame types.
      *
      * @todo flip values and keys?
      *
-     * @var array<string => int>
+     * @var array<string, int>
      */
     public const FRAME_TYPES = [
         'continuation' => self::TYPE_CONTINUATION,
@@ -191,10 +188,11 @@ abstract class Protocol
         'ping' => self::TYPE_PING,
         'pong' => self::TYPE_PONG,
     ];
+
     /**
      * HTTP errors.
      *
-     * @var array<int => string>
+     * @var array<int, string>
      */
     public const HTTP_RESPONSES = [
         self::HTTP_SWITCHING_PROTOCOLS => 'Switching Protocols',
@@ -205,6 +203,7 @@ abstract class Protocol
         self::HTTP_NOT_IMPLEMENTED => 'Not Implemented',
         self::HTTP_RATE_LIMITED => 'Enhance Your Calm',
     ];
+
     /**
      * Valid schemes.
      *
@@ -300,13 +299,10 @@ abstract class Protocol
     /**
      * Validates a WebSocket URI.
      *
-     * @param string $uri
-     *
-     * @return array(string $scheme, string $host, int $port, string $path)
+     * @return array{scheme: string, host: string, port: int, path: string}
      */
-    public function validateUri($uri)
+    public function validateUri(string $uri)
     {
-        $uri = (string) $uri;
         if (!$uri) {
             throw new InvalidArgumentException('Invalid URI');
         }
@@ -387,13 +383,9 @@ abstract class Protocol
     /**
      * Gets the default request headers.
      *
-     * @param string $host
-     * @param string $key
-     * @param string $origin
-     *
      * @return string[]
      */
-    protected function getDefaultRequestHeaders($host, $key, $origin)
+    protected function getDefaultRequestHeaders(string $host, string $key, string $origin)
     {
         return [
             self::HEADER_HOST => $host,
@@ -406,24 +398,17 @@ abstract class Protocol
     }
 
     /**
-     * Gets a version number.
-     *
-     * @return
+     * Gets the version number.
      */
-    abstract public function getVersion();
+    abstract public function getVersion(): int;
 
     /**
      * Gets a handshake response body.
-     *
-     * @param string $key
-     * @param array  $headers
      */
-    public function getResponseHandshake($key, array $headers = [])
+    public function getResponseHandshake(string $key, array $headers = [])
     {
         $headers = \array_merge(
-            $this->getSuccessResponseHeaders(
-                $key
-            ),
+            $this->getSuccessResponseHeaders($key),
             $headers
         );
 
@@ -515,15 +500,9 @@ abstract class Protocol
     }
 
     /**
-     * @todo better header handling
-     * @todo throw exception
-     *
-     * @param string $response
-     * @param string $key
-     *
-     * @return bool
+     * @throws HandshakeException
      */
-    public function validateResponseHandshake($response, $key)
+    public function validateResponseHandshake(string $response, string $key): bool
     {
         if (!$response) {
             return false;
@@ -546,19 +525,15 @@ abstract class Protocol
         \preg_match('#Sec-WebSocket-Accept:\s(.*)$#imU', $response, $matches);
         $keyAccept = \trim($matches[1]);
 
-        return ($keyAccept === $this->getEncodedHash($key)) ? true : false;
+        return $keyAccept === $this->getEncodedHash($key);
     }
 
     /**
      * Gets the headers from a full response.
      *
-     * @param string $response
-     *
-     * @throws InvalidArgumentException
-     *
-     * @return array()
+     * @return array<string, array>
      */
-    protected function getHeaders($response, &$request_line = null)
+    protected function getHeaders(string $response)
     {
         $parts = \explode("\r\n\r\n", $response, 2);
 
@@ -791,15 +766,12 @@ abstract class Protocol
     /**
      * Validates a socket URI.
      *
-     * @param string $uri
-     *
      * @throws InvalidArgumentException
      *
      * @return array(string $scheme, string $host, string $port)
      */
-    public function validateSocketUri($uri)
+    public function validateSocketUri(string $uri)
     {
-        $uri = (string) $uri;
         if (!$uri) {
             throw new InvalidArgumentException('Invalid URI');
         }

@@ -7,5 +7,5 @@ interface UpdateHandlerInterface
     /**
      * Handle an update tick.
      */
-    public function onUpdate();
+    public function onUpdate(): void;
 }

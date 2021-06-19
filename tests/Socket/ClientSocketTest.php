@@ -4,6 +4,7 @@ namespace Wrench\Socket;
 
 use InvalidArgumentException;
 use stdClass;
+use TypeError;
 use Wrench\Exception\SocketException;
 use Wrench\Protocol\Rfc6455Protocol;
 use Wrench\Test\ServerTestHelper;
@@ -91,7 +92,7 @@ class ClientSocketTest extends UriSocketTest
 
     public function testConstructorUriEmpty(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         new ClientSocket(null);
     }

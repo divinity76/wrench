@@ -3,6 +3,7 @@
 namespace Wrench;
 
 use InvalidArgumentException;
+use TypeError;
 use Wrench\Payload\Payload;
 use Wrench\Protocol\Protocol;
 use Wrench\Socket\ClientSocket;
@@ -56,7 +57,7 @@ class ClientTest extends BaseTest
 
     public function testConstructorUriEmpty(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         new Client(null, 'http://www.example.com/');
     }
@@ -70,7 +71,7 @@ class ClientTest extends BaseTest
 
     public function testConstructorOriginEmpty(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(TypeError::class);
 
         new Client('wss://localhost', null);
     }

@@ -10,13 +10,7 @@ class BasicServer extends Server
     protected $rateLimiter;
     protected $originPolicy;
 
-    /**
-     * Constructor.
-     *
-     * @param string $uri
-     * @param array  $options
-     */
-    public function __construct($uri, array $options = [])
+    public function __construct(string $uri, array $options = [])
     {
         parent::__construct($uri, $options);
 
@@ -42,16 +36,6 @@ class BasicServer extends Server
         if ($this->options['check_origin']) {
             $this->originPolicy->listen($this);
         }
-    }
-
-    /**
-     * Adds an allowed origin.
-     *
-     * @param array $origin
-     */
-    public function addAllowedOrigin(string $origin): void
-    {
-        $this->originPolicy->addAllowedOrigin($origin);
     }
 
     /**

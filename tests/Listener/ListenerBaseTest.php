@@ -13,10 +13,9 @@ abstract class ListenerBaseTest extends BaseTest
     /**
      * @depends testConstructor
      *
-     * @param Listener $instance
      * @doesNotPerformAssertions
      */
-    public function testListen(Listener $instance): void
+    public function testListen(ListenerInterface $instance): void
     {
         $server = $this->createMock(Server::class);
         $instance->listen($server);

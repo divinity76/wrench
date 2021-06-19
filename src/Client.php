@@ -64,26 +64,21 @@ class Client extends Configurable
     protected $received = [];
 
     /**
-     * Constructor.
-     *
-     * @param string $uri
      * @param string $origin  The origin to include in the handshake (required
      *                        in later versions of the protocol)
      * @param array  $options (optional) Array of options
      *                        - socket   => Socket instance (otherwise created)
      *                        - protocol => Protocol
      */
-    public function __construct($uri, $origin, array $options = [])
+    public function __construct(string $uri, string $origin, array $options = [])
     {
         parent::__construct($options);
 
-        $uri = (string) $uri;
         if (!$uri) {
             throw new InvalidArgumentException('No URI specified');
         }
         $this->uri = $uri;
 
-        $origin = (string) $origin;
         if (!$origin) {
             throw new InvalidArgumentException('No origin specified');
         }

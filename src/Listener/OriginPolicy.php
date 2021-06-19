@@ -6,7 +6,7 @@ use Wrench\Connection;
 use Wrench\Protocol\Protocol;
 use Wrench\Server;
 
-class OriginPolicy implements Listener, HandshakeRequestListener
+class OriginPolicy implements ListenerInterface, HandshakeRequestListenerInterface
 {
     protected $allowed = [];
 
@@ -16,14 +16,7 @@ class OriginPolicy implements Listener, HandshakeRequestListener
     }
 
     /**
-     * Handshake request listener
      * Closes the connection on handshake from an origin that isn't allowed.
-     *
-     * @param Connection $connection
-     * @param string     $path
-     * @param string     $origin
-     * @param string     $key
-     * @param array      $extensions
      */
     public function onHandshakeRequest(
         Connection $connection,
@@ -68,9 +61,6 @@ class OriginPolicy implements Listener, HandshakeRequestListener
         return false;
     }
 
-    /**
-     * @param Server $server
-     */
     public function listen(Server $server): void
     {
         $server->addListener(

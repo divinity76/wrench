@@ -7,6 +7,7 @@ use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
+use Wrench\Application\BinaryDataHandlerInterface;
 use Wrench\Application\ConnectionHandlerInterface;
 use Wrench\Application\DataHandlerInterface;
 use Wrench\Application\UpdateHandlerInterface;
@@ -29,7 +30,7 @@ class Server extends Configurable implements LoggerAwareInterface
         setLogger as private traitSetLogger;
     }
 
-    /**#@+
+    /**
      * Events
      *
      * @var string
@@ -39,7 +40,6 @@ class Server extends Configurable implements LoggerAwareInterface
     public const EVENT_HANDSHAKE_REQUEST = 'handshake_request';
     public const EVENT_HANDSHAKE_SUCCESSFUL = 'handshake_successful';
     public const EVENT_CLIENT_DATA = 'client_data';
-    /**#@-*/
 
     /**
      * The URI of the server.
@@ -59,7 +59,7 @@ class Server extends Configurable implements LoggerAwareInterface
      * Event listeners
      * Add listeners using the addListener() method.
      *
-     * @var array<string => array<Closure>>
+     * @var array<string, array<callable>>
      */
     protected $listeners = [];
 
@@ -76,20 +76,11 @@ class Server extends Configurable implements LoggerAwareInterface
     protected $loop;
 
     /**
-     * Applications.
-     *
-     * @var array<string => Application>
+     * @var array<string, BinaryDataHandlerInterface|ConnectionHandlerInterface|DataHandlerInterface|UpdateHandlerInterface>
      */
     protected $applications = [];
 
-    /**
-     * Constructor.
-     *
-     * @param string $uri     Websocket URI, e.g. ws://localhost:8000/, path will
-     *                        be ignored
-     * @param array  $options (optional) See configure
-     */
-    public function __construct($uri, array $options = [])
+    public function __construct(string $uri, array $options = [])
     {
         $this->uri = $uri;
         $this->logger = new NullLogger();
@@ -144,7 +135,7 @@ class Server extends Configurable implements LoggerAwareInterface
              * be implemented in the 'onUpdate' method.
              */
             foreach ($this->applications as $application) {
-                if (\method_exists($application, 'onUpdate')) {
+                if ($application instanceof UpdateHandlerInterface) {
                     $application->onUpdate();
                 }
             }
@@ -199,32 +190,23 @@ class Server extends Configurable implements LoggerAwareInterface
     /**
      * Returns a server application.
      *
-     * @param string $key name of application
-     *
-     * @return DataHandlerInterface|ConnectionHandlerInterface|UpdateHandlerInterface|null The application object
+     * @return BinaryDataHandlerInterface|ConnectionHandlerInterface|DataHandlerInterface|UpdateHandlerInterface|null
      */
-    public function getApplication($key)
+    public function getApplication(string $key)
     {
         if (empty($key)) {
             return null;
         }
 
-        if (\array_key_exists($key, $this->applications)) {
-            return $this->applications[$key];
-        }
-
-        return null;
+        return $this->applications[$key] ?? null;
     }
 
     /**
      * Adds a new application object to the application storage.
      *
-     * @param string                                                                 $key         name of application
-     * @param DataHandlerInterface|ConnectionHandlerInterface|UpdateHandlerInterface $application The application object
-     *
-     * @return void
+     * @param BinaryDataHandlerInterface|ConnectionHandlerInterface|DataHandlerInterface|UpdateHandlerInterface $application
      */
-    public function registerApplication($key, $application): void
+    public function registerApplication(string $key, object $application): void
     {
         $this->applications[$key] = $application;
     }
@@ -235,8 +217,7 @@ class Server extends Configurable implements LoggerAwareInterface
      * Options include
      *   - socket_class      => The socket class to use, defaults to ServerSocket
      *   - socket_options    => An array of socket options
-     *   - logger            => Closure($message, $priority = 'info'), used
-     *                                 for logging
+     *   - logger            => LoggerInterface, used for logging
      *
      * @param array $options
      *

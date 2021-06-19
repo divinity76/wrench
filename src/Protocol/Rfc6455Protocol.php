@@ -9,22 +9,15 @@ namespace Wrench\Protocol;
  */
 class Rfc6455Protocol extends HybiProtocol
 {
-    public const VERSION = 13;
+    private const VERSION = 13;
 
-    public function getVersion()
+    public function getVersion(): int
     {
         return self::VERSION;
     }
 
-    /**
-     * This is our most recent protocol class.
-     */
     public function acceptsVersion($version)
     {
-        if ((int) $version <= 13) {
-            return true;
-        }
-
-        return false;
+        return ((int) $version) <= self::VERSION;
     }
 }

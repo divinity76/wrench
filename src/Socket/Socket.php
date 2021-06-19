@@ -4,7 +4,7 @@ namespace Wrench\Socket;
 
 use InvalidArgumentException;
 use Wrench\Exception\SocketException;
-use Wrench\Resource;
+use Wrench\ResourceInterface;
 use Wrench\Util\Configurable;
 
 /**
@@ -15,7 +15,7 @@ use Wrench\Util\Configurable;
  * represents a single underlying socket resource. It's designed to be used
  * by aggregation, rather than inheritance.
  */
-abstract class Socket extends Configurable implements Resource
+abstract class Socket extends Configurable implements ResourceInterface
 {
     /**
      * Default timeout for socket operations (reads, writes).
@@ -27,16 +27,10 @@ abstract class Socket extends Configurable implements Resource
     /**
      * @var int
      */
-    public const DEFAULT_RECEIVE_LENGTH = '1400';
+    public const DEFAULT_RECEIVE_LENGTH = 1400;
 
-    /**#@+
-     * Socket name parts
-     *
-     * @var int
-     */
     public const NAME_PART_IP = 0;
     public const NAME_PART_PORT = 1;
-    /**#@-*/
 
     /**
      * @var resource
@@ -108,12 +102,10 @@ abstract class Socket extends Configurable implements Resource
      * So, the part number here is either the last : delimited section (the port)
      * or all the other sections (the whole initial part, the address).
      *
-     * @param string       $name (from $this->getName() usually)
-     * @param int   <0, 1> $part
+     * @param string $name (from $this->getName() usually)
+     * @param int    $part 0 or 1
      *
      * @throws SocketException
-     *
-     * @return string
      */
     public static function getNamePart(string $name, int $part): string
     {
@@ -196,7 +188,7 @@ abstract class Socket extends Configurable implements Resource
 
     public function getResourceId(): int
     {
-        return (int) $this->socket;
+        return \get_resource_id($this->socket);
     }
 
     /**
@@ -284,7 +276,7 @@ abstract class Socket extends Configurable implements Resource
                     $continue = true;
                 }
 
-                if (\strlen($result) == $length) {
+                if (\strlen($result) === $length) {
                     $continue = true;
                 }
 

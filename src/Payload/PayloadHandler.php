@@ -63,7 +63,7 @@ class PayloadHandler extends Configurable
                 $chunkSize = 2;
             } elseif ($remaining > 0) {
                 $chunkSize = $remaining;
-            } elseif (0 === $remaining) {
+            } else {
                 $chunkSize = 0;
             }
 

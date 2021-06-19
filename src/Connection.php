@@ -7,6 +7,7 @@ use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 use RuntimeException;
 use Throwable;
+use Wrench\Application\BinaryDataHandlerInterface;
 use Wrench\Application\ConnectionHandlerInterface;
 use Wrench\Application\DataHandlerInterface;
 use Wrench\Application\UpdateHandlerInterface;
@@ -102,13 +103,6 @@ class Connection extends Configurable implements LoggerAwareInterface
      */
     protected $payloadHandler;
 
-    /**
-     * Constructor.
-     *
-     * @param ConnectionManager  $manager
-     * @param ServerClientSocket $socket
-     * @param array              $options
-     */
     public function __construct(
         ConnectionManager $manager,
         ServerClientSocket $socket,
@@ -182,14 +176,14 @@ class Connection extends Configurable implements LoggerAwareInterface
 
         switch ($type = $payload->getType()) {
             case Protocol::TYPE_TEXT:
-                if (\method_exists($app, 'onData')) {
+                if ($app instanceof DataHandlerInterface) {
                     $app->onData((string) $payload, $this);
                 }
 
                 return;
 
             case Protocol::TYPE_BINARY:
-                if (\method_exists($app, 'onBinaryData')) {
+                if ($app instanceof BinaryDataHandlerInterface) {
                     $app->onBinaryData((string) $payload, $this);
                 } else {
                     $this->close(1003);
@@ -225,11 +219,11 @@ class Connection extends Configurable implements LoggerAwareInterface
     /**
      * Gets the client application.
      *
-     * @return DataHandlerInterface|ConnectionHandlerInterface|UpdateHandlerInterface
+     * @return BinaryDataHandlerInterface|ConnectionHandlerInterface|DataHandlerInterface|UpdateHandlerInterface|false
      */
     public function getClientApplication()
     {
-        return (isset($this->application)) ? $this->application : false;
+        return $this->application ?? false;
     }
 
     /**
@@ -270,7 +264,7 @@ class Connection extends Configurable implements LoggerAwareInterface
             $this->logger->warning('Unable to send close message');
         }
 
-        if ($this->application && \method_exists($this->application, 'onDisconnect')) {
+        if ($this->application instanceof ConnectionHandlerInterface) {
             $this->application->onDisconnect($this);
         }
 
@@ -283,12 +277,12 @@ class Connection extends Configurable implements LoggerAwareInterface
     /**
      * Sends the payload to the connection.
      *
-     * @param string|Payload|mixed $data
-     * @param int                  $type
+     * @param mixed $data
+     * @param int   $type
      *
      * @return bool
      */
-    public function send(string $data, int $type = Protocol::TYPE_TEXT): bool
+    public function send($data, int $type = Protocol::TYPE_TEXT): bool
     {
         if (!$this->handshaked) {
             throw new HandshakeException('Connection is not handshaked');
@@ -396,7 +390,7 @@ class Connection extends Configurable implements LoggerAwareInterface
                 [$this]
             );
 
-            if (\method_exists($this->application, 'onConnect')) {
+            if ($this->application instanceof ConnectionHandlerInterface) {
                 $this->application->onConnect($this);
             }
         } catch (WrenchException $e) {

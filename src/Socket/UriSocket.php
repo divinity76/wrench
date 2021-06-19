@@ -11,8 +11,6 @@ abstract class UriSocket extends Socket
     protected $port;
 
     /**
-     * URI Socket constructor.
-     *
      * @param string $uri     WebSocket URI, e.g. ws://example.org:8000/chat
      * @param array  $options (optional)
      *                        Options:
@@ -26,7 +24,7 @@ abstract class UriSocket extends Socket
      *                        - server_ssl_allow_self_signed => boolean, whether to allows self-
      *                        signed certs
      */
-    public function __construct($uri, array $options = [])
+    public function __construct(string $uri, array $options = [])
     {
         parent::__construct($options);
 

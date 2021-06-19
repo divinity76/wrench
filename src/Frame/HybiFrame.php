@@ -220,13 +220,15 @@ class HybiFrame extends Frame
     {
         $initial = $this->getInitialLength();
 
-        if ($initial < 126) {
-            return 0;
-        } elseif (126 === $initial) {
+        if (126 === $initial) {
             return 2;
-        } elseif (127 === $initial) {
+        }
+
+        if (127 === $initial) {
             return 8;
         }
+
+        return 0;
     }
 
     /**

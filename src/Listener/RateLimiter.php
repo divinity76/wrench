@@ -10,7 +10,7 @@ use Wrench\Exception\RateLimiterException;
 use Wrench\Server;
 use Wrench\Util\Configurable;
 
-class RateLimiter extends Configurable implements Listener, LoggerAwareInterface
+class RateLimiter extends Configurable implements ListenerInterface, LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -35,11 +35,6 @@ class RateLimiter extends Configurable implements Listener, LoggerAwareInterface
      */
     protected $requests = [];
 
-    /**
-     * Constructor.
-     *
-     * @param array $options
-     */
     public function __construct(array $options = [])
     {
         parent::__construct($options);

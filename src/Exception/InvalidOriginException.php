@@ -2,6 +2,7 @@
 
 namespace Wrench\Exception;
 
+use Throwable;
 use Wrench\Protocol\Protocol;
 
 /**
@@ -9,16 +10,8 @@ use Wrench\Protocol\Protocol;
  */
 class InvalidOriginException extends HandshakeException
 {
-    /**
-     * @param string    $message
-     * @param int       $code
-     * @param Exception $previous
-     */
-    public function __construct($message = null, $code = null, $previous = null)
+    public function __construct(string $message = '', int $code = null, Throwable $previous = null)
     {
-        if (null == $code) {
-            $code = Protocol::HTTP_FORBIDDEN;
-        }
-        parent::__construct($message, $code, $previous);
+        parent::__construct($message, $code ?? Protocol::HTTP_FORBIDDEN, $previous);
     }
 }
