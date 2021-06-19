@@ -31,7 +31,7 @@ class Server extends Configurable implements LoggerAwareInterface
     }
 
     /**
-     * Events
+     * Events.
      *
      * @var string
      */

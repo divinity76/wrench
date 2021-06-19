@@ -15,7 +15,7 @@ use Wrench\Payload\Payload;
 abstract class Protocol
 {
     /**
-     * Relevant schemes
+     * Relevant schemes.
      *
      * @var string
      */
@@ -25,7 +25,7 @@ abstract class Protocol
     public const SCHEME_UNDERLYING_SECURE = 'tls';
 
     /**
-     * HTTP headers
+     * HTTP headers.
      *
      * @var string
      */
@@ -40,7 +40,7 @@ abstract class Protocol
     public const HEADER_UPGRADE = 'upgrade';
 
     /**
-     * HTTP error statuses
+     * HTTP error statuses.
      *
      * @var int
      */
@@ -54,9 +54,10 @@ abstract class Protocol
     public const HTTP_NOT_IMPLEMENTED = 501;
 
     /**
-     * Close statuses
+     * Close statuses.
      *
      * @see http://tools.ietf.org/html/rfc6455#section-7.4
+     *
      * @var int
      */
     public const CLOSE_NORMAL = 1000;
@@ -82,7 +83,7 @@ abstract class Protocol
      *  %x8 denotes a connection close
      *  %x9 denotes a ping
      *  %xA denotes a pong
-     *  %xB-F are reserved for further control frames
+     *  %xB-F are reserved for further control frames.
      *
      * @var int
      */
