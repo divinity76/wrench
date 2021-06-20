@@ -3,8 +3,9 @@
 namespace Wrench\Socket;
 
 use Wrench\Protocol\Protocol;
+use Socket;
 
-abstract class UriSocket extends Socket
+abstract class UriSocket extends AbstractSocket
 {
     protected $scheme;
     protected $host;
@@ -47,8 +48,6 @@ abstract class UriSocket extends Socket
 
     /**
      * @todo DNS lookup? Override getIp()?
-     *
-     * @return string
      */
     protected function getName(): string
     {
@@ -57,8 +56,6 @@ abstract class UriSocket extends Socket
 
     /**
      * Gets the canonical/normalized URI for this socket.
-     *
-     * @return string
      */
     protected function getUri(): string
     {
@@ -73,9 +70,9 @@ abstract class UriSocket extends Socket
     /**
      * Gets a stream context.
      *
-     * @return resource
+     * @return resource|Socket
      */
-    protected function getStreamContext($listen = false)
+    protected function getStreamContext(bool $listen = false)
     {
         $options = [];
 
@@ -96,18 +93,16 @@ abstract class UriSocket extends Socket
     }
 
     /**
-     * Returns an array of socket stream context options
-     * See http://php.net/manual/en/context.socket.php.
+     * Returns an array of socket stream context options.
      *
-     * @return array
+     * See http://php.net/manual/en/context.socket.php.
      */
     abstract protected function getSocketStreamContextOptions(): array;
 
     /**
-     * Returns an array of ssl stream context options
-     * See http://php.net/manual/en/context.ssl.php.
+     * Returns an array of ssl stream context options.
      *
-     * @return array
+     * See http://php.net/manual/en/context.ssl.php.
      */
     abstract protected function getSslStreamContextOptions(): array;
 }

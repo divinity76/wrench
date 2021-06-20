@@ -6,6 +6,7 @@ use InvalidArgumentException;
 use Wrench\Exception\SocketException;
 use Wrench\ResourceInterface;
 use Wrench\Util\Configurable;
+use Socket;
 
 /**
  * Socket class
@@ -15,7 +16,7 @@ use Wrench\Util\Configurable;
  * represents a single underlying socket resource. It's designed to be used
  * by aggregation, rather than inheritance.
  */
-abstract class Socket extends Configurable implements ResourceInterface
+abstract class AbstractSocket extends Configurable implements ResourceInterface
 {
     /**
      * Default timeout for socket operations (reads, writes).
@@ -24,16 +25,13 @@ abstract class Socket extends Configurable implements ResourceInterface
      */
     public const TIMEOUT_SOCKET = 5;
 
-    /**
-     * @var int
-     */
     public const DEFAULT_RECEIVE_LENGTH = 1400;
 
     public const NAME_PART_IP = 0;
     public const NAME_PART_PORT = 1;
 
     /**
-     * @var resource
+     * @var resource|Socket|null
      */
     protected $socket = null;
 
@@ -179,15 +177,19 @@ abstract class Socket extends Configurable implements ResourceInterface
     }
 
     /**
-     * @return resource
+     * @return resource|Socket|null
      */
     public function getResource()
     {
         return $this->socket;
     }
 
-    public function getResourceId(): int
+    public function getResourceId(): ?int
     {
+        if (null === $this->socket) {
+            return null;
+        }
+
         return \get_resource_id($this->socket);
     }
 
@@ -225,10 +227,6 @@ abstract class Socket extends Configurable implements ResourceInterface
 
     /**
      * Receive data from the socket.
-     *
-     * @param int $length
-     *
-     * @return string
      */
     public function receive(int $length = self::DEFAULT_RECEIVE_LENGTH): string
     {
@@ -271,7 +269,7 @@ abstract class Socket extends Configurable implements ResourceInterface
 
                 $continue = false;
 
-                if (1 == \strlen($result)) {
+                if (1 === \strlen($result)) {
                     // Workaround Chrome behavior (still needed?)
                     $continue = true;
                 }
@@ -283,7 +281,7 @@ abstract class Socket extends Configurable implements ResourceInterface
                 // Continue if more data to be read
                 $metadata = \stream_get_meta_data($this->socket);
 
-                if ($metadata && isset($metadata['unread_bytes'])) {
+                if (isset($metadata['unread_bytes'])) {
                     if (!$metadata['unread_bytes']) {
                         // stop it, if we read a full message in previous time
                         $continue = false;

@@ -5,10 +5,12 @@ namespace Wrench\Listener;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use TypeError;
 use Wrench\Connection;
-use Wrench\Exception\RateLimiterException;
 use Wrench\Server;
 use Wrench\Util\Configurable;
+use Wrench\Protocol\Protocol;
+use Socket;
 
 class RateLimiter extends Configurable implements ListenerInterface, LoggerAwareInterface
 {
@@ -63,23 +65,24 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
     }
 
     /**
-     * Event listener.
-     *
-     * @param resource   $socket
-     * @param Connection $connection
+     * @param resource|Socket $socket
      */
     public function onSocketConnect($socket, Connection $connection): void
     {
+        if (!\is_resource($socket) && !$socket instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
+            );
+        }
+
         $this->checkConnections($connection);
         $this->checkConnectionsPerIp($connection);
     }
 
     /**
      * Idempotent.
-     *
-     * @param Connection $connection
      */
-    protected function checkConnections($connection): void
+    protected function checkConnections(Connection $connection): void
     {
         $connections = $connection->getConnectionManager()->count();
 
@@ -90,27 +93,20 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
 
     /**
      * Limits the given connection.
-     *
-     * @param Connection $connection
-     * @param string     $limit      Reason
      */
-    protected function limit($connection, $limit): void
+    protected function limit(Connection $connection, string $reason): void
     {
-        $this->logger->notice(\sprintf(
-            'Limiting connection %s: %s',
-            $connection->getIp(),
-            $limit
-        ));
+        $this->logger->notice(
+            \sprintf('Limiting connection %s: %s', $connection->getIp(), $reason)
+        );
 
-        $connection->close(new RateLimiterException($limit));
+        $connection->close(Protocol::CLOSE_GOING_AWAY);
     }
 
     /**
      * NOT idempotent, call once per connection.
-     *
-     * @param Connection $connection
      */
-    protected function checkConnectionsPerIp($connection): void
+    protected function checkConnectionsPerIp(Connection $connection): void
     {
         $ip = $connection->getIp();
 
@@ -135,20 +131,21 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
     }
 
     /**
-     * Event listener.
-     *
-     * @param resource   $socket
-     * @param Connection $connection
+     * @param resource|Socket $socket
      */
     public function onSocketDisconnect($socket, Connection $connection): void
     {
+        if (!\is_resource($socket) && !$socket instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
+            );
+        }
+
         $this->releaseConnection($connection);
     }
 
     /**
      * NOT idempotent, call once per disconnection.
-     *
-     * @param Connection $connection
      */
     protected function releaseConnection(Connection $connection): void
     {
@@ -170,20 +167,21 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
     }
 
     /**
-     * Event listener.
-     *
-     * @param resource   $socket
-     * @param Connection $connection
+     * @param resource|Socket $socket
      */
     public function onClientData($socket, Connection $connection): void
     {
+        if (!\is_resource($socket) && !$socket instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
+            );
+        }
+
         $this->checkRequestsPerMinute($connection);
     }
 
     /**
      * NOT idempotent, call once per data.
-     *
-     * @param Connection $connection
      */
     protected function checkRequestsPerMinute(Connection $connection): void
     {
@@ -206,9 +204,6 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
         }
     }
 
-    /**
-     * @param array $options
-     */
     protected function configure(array $options): void
     {
         $options = \array_merge([

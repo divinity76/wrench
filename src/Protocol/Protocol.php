@@ -16,8 +16,6 @@ abstract class Protocol
 {
     /**
      * Relevant schemes.
-     *
-     * @var string
      */
     public const SCHEME_WEBSOCKET = 'ws';
     public const SCHEME_WEBSOCKET_SECURE = 'wss';
@@ -26,8 +24,6 @@ abstract class Protocol
 
     /**
      * HTTP headers.
-     *
-     * @var string
      */
     public const HEADER_HOST = 'host';
     public const HEADER_KEY = 'sec-websocket-key';
@@ -41,8 +37,6 @@ abstract class Protocol
 
     /**
      * HTTP error statuses.
-     *
-     * @var int
      */
     public const HTTP_SWITCHING_PROTOCOLS = 101;
     public const HTTP_BAD_REQUEST = 400;
@@ -57,8 +51,6 @@ abstract class Protocol
      * Close statuses.
      *
      * @see http://tools.ietf.org/html/rfc6455#section-7.4
-     *
-     * @var int
      */
     public const CLOSE_NORMAL = 1000;
     public const CLOSE_GOING_AWAY = 1001;
@@ -84,8 +76,6 @@ abstract class Protocol
      *  %x9 denotes a ping
      *  %xA denotes a pong
      *  %xB-F are reserved for further control frames.
-     *
-     * @var int
      */
     public const TYPE_CONTINUATION = 0;
     public const TYPE_TEXT = 1;
@@ -105,59 +95,42 @@ abstract class Protocol
     public const TYPE_RESERVED_15 = 15;
 
     /**
-     * Magic GUID
      * Used in the WebSocket accept header.
-     *
-     * @var string
      */
     public const MAGIC_GUID = '258EAFA5-E914-47DA-95CA-C5AB0DC85B11';
 
     /**
      * The request MUST contain an |Upgrade| header field whose value
-     *   MUST include the "websocket" keyword.
+     * MUST include the "websocket" keyword.
      */
     public const UPGRADE_VALUE = 'websocket';
 
     /**
      * The request MUST contain a |Connection| header field whose value
-     *   MUST include the "Upgrade" token.
+     * MUST include the "Upgrade" token.
      */
     public const CONNECTION_VALUE = 'Upgrade';
 
     /**
-     * Request line format.
-     *
-     * @var string printf compatible, passed request path string
+     * printf compatible, passed request path string.
      */
     public const REQUEST_LINE_FORMAT = 'GET %s HTTP/1.1';
 
     /**
-     * Request line regex
-     * Used for parsing requested path.
-     *
-     * @var string preg_* compatible
+     * Used for parsing requested path. preg_* compatible.
      */
     public const REQUEST_LINE_REGEX = '/^GET (\S+) HTTP\/1.1$/';
 
     /**
-     * Response line format.
-     *
-     * @var string
+     * printf compatible.
      */
     public const RESPONSE_LINE_FORMAT = 'HTTP/1.1 %d %s';
 
     /**
-     * Header line format.
-     *
-     * @var string printf compatible, passed header name and value
+     * printf compatible, passed header name and value.
      */
     public const HEADER_LINE_FORMAT = '%s: %s';
 
-    /**
-     * Close status codes.
-     *
-     * @var array<int, string>
-     */
     public const CLOSE_REASONS = [
         self::CLOSE_NORMAL => 'normal close',
         self::CLOSE_GOING_AWAY => 'going away',
@@ -174,13 +147,6 @@ abstract class Protocol
         self::CLOSE_RESERVED_TLS => null,
     ];
 
-    /**
-     * Frame types.
-     *
-     * @todo flip values and keys?
-     *
-     * @var array<string, int>
-     */
     public const FRAME_TYPES = [
         'continuation' => self::TYPE_CONTINUATION,
         'text' => self::TYPE_TEXT,
@@ -190,11 +156,6 @@ abstract class Protocol
         'pong' => self::TYPE_PONG,
     ];
 
-    /**
-     * HTTP errors.
-     *
-     * @var array<int, string>
-     */
     public const HTTP_RESPONSES = [
         self::HTTP_SWITCHING_PROTOCOLS => 'Switching Protocols',
         self::HTTP_BAD_REQUEST => 'Bad Request',
@@ -208,7 +169,7 @@ abstract class Protocol
     /**
      * Valid schemes.
      *
-     * @var array<string>
+     * @var list<string>
      */
     protected static $schemes = [
         self::SCHEME_WEBSOCKET,
@@ -218,13 +179,12 @@ abstract class Protocol
     ];
 
     /**
-     * Generates a key suitable for use in the protocol
+     * Generates a key suitable for use in the protocol.
+     *
      * This base implementation returns a 16-byte (128 bit) random key as a
      * binary string.
-     *
-     * @return string
      */
-    public function generateKey()
+    public function generateKey(): string
     {
         if (\extension_loaded('openssl')) {
             $key = \openssl_random_pseudo_bytes(16);
@@ -250,15 +210,13 @@ abstract class Protocol
      * @param string $uri    WebSocket URI, e.g. ws://example.org:8000/chat
      * @param string $key    16 byte binary string key
      * @param string $origin Origin of the request
-     *
-     * @return string
      */
     public function getRequestHandshake(
-        $uri,
-        $key,
-        $origin,
+        string $uri,
+        string $key,
+        string $origin,
         array $headers = []
-    ) {
+    ): string {
         if (!$uri || !$key || !$origin) {
             throw new InvalidArgumentException('You must supply a URI, key and origin');
         }
@@ -300,16 +258,16 @@ abstract class Protocol
     /**
      * Validates a WebSocket URI.
      *
-     * @return array{scheme: string, host: string, port: int, path: string}
+     * @throws InvalidArgumentException
      */
-    public function validateUri(string $uri)
+    public function validateUri(string $uri): array
     {
         if (!$uri) {
             throw new InvalidArgumentException('Invalid URI');
         }
 
         $scheme = \parse_url($uri, \PHP_URL_SCHEME);
-        $this->validateScheme($scheme);
+        $this->validateScheme($scheme ?: '');
 
         $host = \parse_url($uri, \PHP_URL_HOST);
         if (!$host) {
@@ -328,19 +286,15 @@ abstract class Protocol
 
         $query = \parse_url($uri, \PHP_URL_QUERY);
 
-        return [$scheme, $host, $port, $path, $query];
+        return [$scheme, $host, $port, $path, $query ?: ''];
     }
 
     /**
      * Validates a scheme.
      *
-     * @param string $scheme
-     *
      * @throws InvalidArgumentException
-     *
-     * @return string Underlying scheme
      */
-    protected function validateScheme($scheme)
+    protected function validateScheme(string $scheme): string
     {
         if (!$scheme) {
             throw new InvalidArgumentException('No scheme specified');
@@ -359,42 +313,46 @@ abstract class Protocol
     /**
      * Gets the default port for a scheme
      * By default, the WebSocket Protocol uses port 80 for regular WebSocket
-     *  connections and port 443 for WebSocket connections tunneled over
-     *  Transport Layer Security.
-     *
-     * @param string|false $scheme
-     *
-     * @return int
+     * connections and port 443 for WebSocket connections tunneled over TLS.
      */
-    protected function getPort($scheme)
+    protected function getPort(string $scheme): int
     {
         if (self::SCHEME_WEBSOCKET == $scheme) {
             return 80;
-        } elseif (self::SCHEME_WEBSOCKET_SECURE == $scheme) {
-            return 443;
-        } elseif (self::SCHEME_UNDERLYING == $scheme) {
-            return 80;
-        } elseif (self::SCHEME_UNDERLYING_SECURE == $scheme) {
-            return 443;
-        } else {
-            throw new InvalidArgumentException('Unknown websocket scheme');
         }
+
+        if (self::SCHEME_WEBSOCKET_SECURE == $scheme) {
+            return 443;
+        }
+
+        if (self::SCHEME_UNDERLYING == $scheme) {
+            return 80;
+        }
+
+        if (self::SCHEME_UNDERLYING_SECURE == $scheme) {
+            return 443;
+        }
+
+        throw new InvalidArgumentException('Unknown websocket scheme');
     }
 
     /**
      * Gets the default request headers.
      *
-     * @return string[]
+     * @return array<string, string>
      */
-    protected function getDefaultRequestHeaders(string $host, string $key, string $origin)
-    {
+    protected function getDefaultRequestHeaders(
+        string $host,
+        string $key,
+        string $origin
+    ): array {
         return [
             self::HEADER_HOST => $host,
             self::HEADER_UPGRADE => self::UPGRADE_VALUE,
             self::HEADER_CONNECTION => self::CONNECTION_VALUE,
             self::HEADER_KEY => $key,
             self::HEADER_ORIGIN => $origin,
-            self::HEADER_VERSION => $this->getVersion(),
+            self::HEADER_VERSION => (string) $this->getVersion(),
         ];
     }
 
@@ -406,7 +364,7 @@ abstract class Protocol
     /**
      * Gets a handshake response body.
      */
-    public function getResponseHandshake(string $key, array $headers = [])
+    public function getResponseHandshake(string $key, array $headers = []): string
     {
         $headers = \array_merge(
             $this->getSuccessResponseHeaders($key),
@@ -450,13 +408,8 @@ abstract class Protocol
 
     /**
      * Gets an HTTP response.
-     *
-     * @param int   $status
-     * @param array $headers
-     *
-     * @return string
      */
-    protected function getHttpResponse($status, array $headers = [])
+    protected function getHttpResponse(int $status, array $headers = []): string
     {
         if (\array_key_exists($status, self::HTTP_RESPONSES)) {
             $response = self::HTTP_RESPONSES[$status];
@@ -583,13 +536,8 @@ abstract class Protocol
      *
      * @throws BadRequestException
      */
-    public function validateRequestHandshake(
-        $request
-    ) {
-        if (!$request) {
-            return false;
-        }
-
+    public function validateRequestHandshake(string $request): array
+    {
         list($request, $headers) = $this->getRequestHeaders($request);
         // make a copy of the headers array to store all extra headers
         $extraHeaders = $headers;
@@ -638,7 +586,7 @@ abstract class Protocol
             throw new BadRequestException('No version header received on handshake request');
         }
 
-        if (!$this->acceptsVersion($headers[self::HEADER_VERSION])) {
+        if (!$this->acceptsVersion((int) $headers[self::HEADER_VERSION])) {
             throw new BadRequestException('Unsupported version: '.$headers[self::HEADER_VERSION]);
         } else {
             unset($extraHeaders[self::HEADER_VERSION]);
@@ -678,14 +626,9 @@ abstract class Protocol
     /**
      * Gets request headers.
      *
-     * @param string $response
-     *
      * @throws InvalidArgumentException
-     *
-     * @return array<string, array<string>> The request line, and an array of
-     *                       headers
      */
-    protected function getRequestHeaders($response)
+    protected function getRequestHeaders(string $response)
     {
         $eol = \stripos($response, "\r\n");
 
@@ -702,18 +645,15 @@ abstract class Protocol
     /**
      * Validates a request line.
      *
-     * @param string $line
-     *
      * @throws BadRequestException
      */
-    protected function validateRequestLine($line)
+    protected function validateRequestLine(string $line): string
     {
-        $matches = [0 => null, 1 => null];
-
-        if (!\preg_match(self::REQUEST_LINE_REGEX, $line, $matches) || !$matches[1]) {
+        if (!\preg_match(self::REQUEST_LINE_REGEX, $line, $matches) || !($matches[1] ?? false)) {
             throw new BadRequestException('Invalid request line', 400);
         }
 
+        /** @var string */
         return $matches[1];
     }
 
@@ -721,31 +661,17 @@ abstract class Protocol
      * Subclasses should implement this method and return a boolean to the given
      * version string, as to whether they would like to accept requests from
      * user agents that specify that version.
-     *
-     * @return bool
      */
-    abstract public function acceptsVersion($version);
+    abstract public function acceptsVersion(int $version): bool;
 
     /**
      * Gets a suitable WebSocket close frame.
-     * Please set `masked` to false if you send a close frame from server side.
      *
-     * @param Exception|int $e
-     * @param bool          $masked
-     *
-     * @return Payload
+     * Set `masked` to false if you send a close frame from server side.
      */
-    public function getClosePayload($e, $masked = true)
+    public function getClosePayload(int $code, bool $masked = true): Payload
     {
-        $code = false;
-
-        if ($e instanceof Exception) {
-            $code = $e->getCode();
-        } elseif (\is_numeric($e)) {
-            $code = (int) $e;
-        }
-
-        if (!$code || !\array_key_exists($code, self::CLOSE_REASONS)) {
+        if (!\array_key_exists($code, self::CLOSE_REASONS)) {
             $code = self::CLOSE_UNEXPECTED;
         }
 
@@ -759,26 +685,21 @@ abstract class Protocol
     /**
      * Gets a payload instance, suitable for use in decoding/encoding protocol
      * frames.
-     *
-     * @return Payload
      */
-    abstract public function getPayload();
+    abstract public function getPayload(): Payload;
 
     /**
      * Validates a socket URI.
      *
      * @throws InvalidArgumentException
-     *
-     * @return array(string $scheme, string $host, string $port)
      */
-    public function validateSocketUri(string $uri)
+    public function validateSocketUri(string $uri): array
     {
         if (!$uri) {
             throw new InvalidArgumentException('Invalid URI');
         }
 
-        $scheme = \parse_url($uri, \PHP_URL_SCHEME);
-        $scheme = $this->validateScheme($scheme);
+        $scheme = $this->validateScheme(\parse_url($uri, \PHP_URL_SCHEME) ?: '');
 
         $host = \parse_url($uri, \PHP_URL_HOST);
         if (!$host) {
@@ -796,13 +717,9 @@ abstract class Protocol
     /**
      * Validates an origin URI.
      *
-     * @param string $origin
-     *
      * @throws InvalidArgumentException
-     *
-     * @return string
      */
-    public function validateOriginUri($origin)
+    public function validateOriginUri(string $origin): string
     {
         $origin = (string) $origin;
         if (!$origin) {

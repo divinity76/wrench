@@ -32,10 +32,6 @@ class OriginPolicy implements ListenerInterface, HandshakeRequestListenerInterfa
 
     /**
      * Whether the specified origin is allowed under this policy.
-     *
-     * @param string $origin
-     *
-     * @return bool
      */
     public function isAllowed(string $origin): bool
     {

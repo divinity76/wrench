@@ -3,6 +3,7 @@
 namespace Wrench\Socket;
 
 use Wrench\Exception\ConnectionException;
+use Socket;
 
 /**
  * Server socket.
@@ -48,7 +49,7 @@ class ServerSocket extends UriSocket
      *
      * @throws ConnectionException
      *
-     * @return resource
+     * @return resource|Socket
      */
     public function accept()
     {
@@ -58,7 +59,7 @@ class ServerSocket extends UriSocket
         );
 
         if (!$new) {
-            throw new ConnectionException(\socket_strerror(\socket_last_error($new)));
+            throw new ConnectionException(\socket_strerror(\socket_last_error()));
         }
 
         \socket_set_option(\socket_import_stream($new), \SOL_TCP, \TCP_NODELAY, 1);

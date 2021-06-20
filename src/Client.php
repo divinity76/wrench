@@ -4,6 +4,8 @@ namespace Wrench;
 
 use InvalidArgumentException;
 use Wrench\Exception\FrameException;
+use Wrench\Exception\HandshakeException;
+use Wrench\Exception\SocketException;
 use Wrench\Payload\Payload;
 use Wrench\Payload\PayloadHandler;
 use Wrench\Protocol\Protocol;
@@ -20,7 +22,7 @@ class Client extends Configurable
     /**
      * @var int bytes
      */
-    public const MAX_HANDSHAKE_RESPONSE = '1500';
+    public const MAX_HANDSHAKE_RESPONSE = 1500;
 
     /**
      * @var string
@@ -33,7 +35,7 @@ class Client extends Configurable
     protected $origin;
 
     /**
-     * @var ClientSocket
+     * @var ClientSocket|null
      */
     protected $socket;
 
@@ -52,7 +54,7 @@ class Client extends Configurable
     protected $connected = false;
 
     /**
-     * @var PayloadHandler
+     * @var PayloadHandler|null
      */
     protected $payloadHandler = null;
 
@@ -67,7 +69,7 @@ class Client extends Configurable
      * @param string $origin  The origin to include in the handshake (required
      *                        in later versions of the protocol)
      * @param array  $options (optional) Array of options
-     *                        - socket   => Socket instance (otherwise created)
+     *                        - socket   => AbstractSocket instance (otherwise created)
      *                        - protocol => Protocol
      */
     public function __construct(string $uri, string $origin, array $options = [])
@@ -125,15 +127,13 @@ class Client extends Configurable
     }
 
     /**
-     * Adds a request header to be included in the initial handshake
-     * For example, to include a Cookie header.
+     * Adds a request header to be included in the initial handshake.
      *
-     * @param string $name
-     * @param string $value
+     * For example, to include a Cookie header.
      *
      * @return void
      */
-    public function addRequestHeader($name, $value): void
+    public function addRequestHeader(string $name, string $value): void
     {
         $this->headers[$name] = $value;
     }
@@ -141,13 +141,11 @@ class Client extends Configurable
     /**
      * Sends data to the socket.
      *
-     * @param string $data
-     * @param int    $type   See Protocol::TYPE_*
-     * @param bool   $masked
+     * @param int $type See Protocol::TYPE_*
      *
      * @return bool Success
      */
-    public function sendData(string $data, int $type = Protocol::TYPE_TEXT, $masked = true)
+    public function sendData(string $data, int $type = Protocol::TYPE_TEXT, bool $masked = true): bool
     {
         if (!$this->isConnected()) {
             return false;
@@ -213,8 +211,8 @@ class Client extends Configurable
     /**
      * Connect to the server.
      *
-     * @throws Exception\HandshakeException
-     * @throws Exception\SocketException
+     * @throws HandshakeException
+     * @throws SocketException
      *
      * @return bool Whether a new connection was made
      */
@@ -250,12 +248,10 @@ class Client extends Configurable
      *
      * @param int $reason Reason for disconnecting. See Protocol::CLOSE_
      *
-     * @throws Exception\SocketException
+     * @throws SocketException
      * @throws FrameException
-     *
-     * @return bool
      */
-    public function disconnect($reason = Protocol::CLOSE_NORMAL): bool
+    public function disconnect(int $reason = Protocol::CLOSE_NORMAL): bool
     {
         if (false === $this->connected) {
             return false;
@@ -279,10 +275,6 @@ class Client extends Configurable
 
     /**
      * Configure options.
-     *
-     * @param array $options
-     *
-     * @return void
      */
     protected function configure(array $options): void
     {

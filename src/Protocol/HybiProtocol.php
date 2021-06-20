@@ -9,7 +9,7 @@ use Wrench\Payload\HybiPayload;
  */
 abstract class HybiProtocol extends Protocol
 {
-    public function getPayload()
+    public function getPayload(): HybiPayload
     {
         return new HybiPayload();
     }

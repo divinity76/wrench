@@ -14,8 +14,8 @@ class Hybi10Protocol extends HybiProtocol
         return self::VERSION;
     }
 
-    public function acceptsVersion($version)
+    public function acceptsVersion(int $version): bool
     {
-        return ((int) $version) === self::VERSION;
+        return $version === self::VERSION;
     }
 }

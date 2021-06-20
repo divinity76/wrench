@@ -7,7 +7,7 @@ use Wrench\Exception\PayloadException;
 use Wrench\Exception\SocketException;
 use Wrench\Frame\Frame;
 use Wrench\Protocol\Protocol;
-use Wrench\Socket\Socket;
+use Wrench\Socket\AbstractSocket;
 
 /**
  * Payload class
@@ -37,11 +37,11 @@ abstract class Payload
      * @param int    $type
      * @param bool   $masked
      *
-     * @return Payload
+     * @return $this
      *
      * @todo No splitting into multiple frames just yet
      */
-    public function encode(string $data, int $type = Protocol::TYPE_TEXT, bool $masked = false)
+    public function encode(string $data, int $type = Protocol::TYPE_TEXT, bool $masked = false): self
     {
         $this->frames = [];
 
@@ -55,15 +55,11 @@ abstract class Payload
 
     /**
      * Get a frame object.
-     *
-     * @return Frame
      */
-    abstract protected function getFrame();
+    abstract protected function getFrame(): Frame;
 
     /**
      * Whether this payload is waiting for more data.
-     *
-     * @return bool
      */
     public function isWaitingForData(): bool
     {
@@ -72,11 +68,10 @@ abstract class Payload
 
     /**
      * Gets the number of remaining bytes before this payload will be
-     * complete
+     * complete.
+     *
      * May return 0 (no more bytes required) or null (unknown number of bytes
      * required).
-     *
-     * @return int|null
      */
     public function getRemainingData(): ?int
     {
@@ -97,10 +92,8 @@ abstract class Payload
 
     /**
      * Whether the payload is complete.
-     *
-     * @return bool
      */
-    public function isComplete()
+    public function isComplete(): bool
     {
         return $this->getCurrentFrame()->isComplete() && $this->getCurrentFrame()->isFinal();
     }
@@ -120,14 +113,10 @@ abstract class Payload
     }
 
     /**
-     * @param Socket $socket
-     *
      * @throws FrameException
      * @throws SocketException
-     *
-     * @return bool
      */
-    public function sendToSocket(Socket $socket): bool
+    public function sendToSocket(AbstractSocket $socket): bool
     {
         $success = true;
 
@@ -143,11 +132,7 @@ abstract class Payload
     /**
      * Receive raw data into the payload.
      *
-     * @param string $data
-     *
      * @throws PayloadException
-     *
-     * @return void
      */
     public function receiveData(string $data): void
     {
@@ -176,8 +161,6 @@ abstract class Payload
      * Gets the frame into which data should be receieved.
      *
      * @throws PayloadException
-     *
-     * @return Frame
      */
     protected function getReceivingFrame(): Frame
     {
@@ -194,10 +177,7 @@ abstract class Payload
         return $current;
     }
 
-    /**
-     * @return string
-     */
-    public function __toString()
+    public function __toString(): string
     {
         try {
             return $this->getPayload();
@@ -209,8 +189,6 @@ abstract class Payload
 
     /**
      * @throws FrameException
-     *
-     * @return string
      */
     public function getPayload(): string
     {
@@ -224,12 +202,11 @@ abstract class Payload
     }
 
     /**
-     * Gets the type of the payload
+     * Gets the type of the payload.
+     *
      * The type of a payload is taken from its first frame.
      *
      * @throws PayloadException
-     *
-     * @return int
      */
     public function getType(): int
     {

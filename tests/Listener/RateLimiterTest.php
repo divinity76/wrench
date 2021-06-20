@@ -19,7 +19,13 @@ class RateLimiterTest extends ListenerBaseTest
      */
     public function testOnSocketConnect(): void
     {
-        $this->getInstance()->onSocketConnect(null, $this->getConnection());
+        $handle = tmpfile();
+
+        try {
+            $this->getInstance()->onSocketConnect($handle, $this->getConnection());
+        } finally {
+            fclose($handle);
+        }
     }
 
     protected function getConnection()
@@ -52,7 +58,13 @@ class RateLimiterTest extends ListenerBaseTest
      */
     public function testOnSocketDisconnect(): void
     {
-        $this->getInstance()->onSocketDisconnect(null, $this->getConnection());
+        $handle = tmpfile();
+
+        try {
+            $this->getInstance()->onSocketDisconnect($handle, $this->getConnection());
+        } finally {
+            fclose($handle);
+        }
     }
 
     /**
@@ -60,6 +72,12 @@ class RateLimiterTest extends ListenerBaseTest
      */
     public function testOnClientData(): void
     {
-        $this->getInstance()->onClientData(null, $this->getConnection());
+        $handle = tmpfile();
+
+        try {
+            $this->getInstance()->onClientData($handle, $this->getConnection());
+        } finally {
+            fclose($handle);
+        }
     }
 }

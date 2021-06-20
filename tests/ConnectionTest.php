@@ -7,7 +7,7 @@ use Wrench\Application\DataHandlerInterface;
 use Wrench\Exception\HandshakeException;
 use Wrench\Protocol\Protocol;
 use Wrench\Socket\ServerClientSocket;
-use Wrench\Socket\Socket;
+use Wrench\Socket\AbstractSocket;
 use Wrench\Test\BaseTest;
 
 /**
@@ -59,7 +59,7 @@ class ConnectionTest extends BaseTest
     /**
      * Gets a mock socket.
      *
-     * @return \PHPUnit_Framework_MockObject_MockObject|Socket
+     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractSocket
      */
     protected function getMockSocket()
     {
@@ -128,7 +128,7 @@ class ConnectionTest extends BaseTest
     }
 
     /**
-     * @return Socket|\PHPUnit_Framework_MockObject_MockObject
+     * @return AbstractSocket|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getConnectedSocket()
     {
@@ -162,7 +162,7 @@ class ConnectionTest extends BaseTest
     }
 
     /**
-     * @return Socket
+     * @return AbstractSocket
      */
     protected function getNotConnectedSocket()
     {

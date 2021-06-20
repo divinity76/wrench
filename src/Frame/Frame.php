@@ -13,19 +13,20 @@ abstract class Frame
     /**
      * The frame data length.
      *
-     * @var int
+     * @var int|null
      */
     protected $length = null;
 
     /**
      * The type of this payload.
      *
-     * @var int
+     * @var int|null
      */
     protected $type = null;
 
     /**
-     * The buffer
+     * The buffer.
+     *
      * May not be a complete payload, because this frame may still be receiving
      * data. See.
      *
@@ -34,7 +35,8 @@ abstract class Frame
     protected $buffer = '';
 
     /**
-     * The enclosed frame payload
+     * The enclosed frame payload.
+     *
      * May not be a complete payload, because this frame might indicate a continuation
      * frame. See isFinal() versus isComplete().
      *
@@ -46,58 +48,43 @@ abstract class Frame
      * Gets the length of the payload.
      *
      * @throws FrameException
-     *
-     * @return int
      */
-    abstract public function getLength();
+    abstract public function getLength(): int;
 
     /**
      * Resets the frame and encodes the given data into it.
      *
-     * @param string $data
-     * @param int    $type
-     * @param bool   $masked
-     *
-     * @return Frame
+     * @return static
      */
-    abstract public function encode($data, $type = Protocol::TYPE_TEXT, $masked = false);
+    abstract public function encode(string $data, int $type = Protocol::TYPE_TEXT, bool $masked = false): self;
 
     /**
      * Whether the frame is the final one in a continuation.
-     *
-     * @return bool
      */
-    abstract public function isFinal();
+    abstract public function isFinal(): bool;
 
-    /**
-     * @return int
-     */
-    abstract public function getType();
+    abstract public function getType(): int;
 
     /**
      * Receieves data into the frame.
      */
-    public function receiveData($data): void
+    public function receiveData(string $data): void
     {
         $this->buffer .= $data;
     }
 
     /**
      * Whether this frame is waiting for more data.
-     *
-     * @return bool
      */
-    public function isWaitingForData()
+    public function isWaitingForData(): bool
     {
         return $this->getRemainingData() > 0;
     }
 
     /**
      * Gets the remaining number of bytes before this frame will be complete.
-     *
-     * @return int|null
      */
-    public function getRemainingData()
+    public function getRemainingData(): ?int
     {
         try {
             return $this->getExpectedBufferLength() - $this->getBufferLength();
@@ -108,31 +95,30 @@ abstract class Frame
 
     /**
      * Gets the expected length of the buffer once all the data has been
-     *  receieved.
+     * receieved.
      *
      * @return int
      */
-    abstract protected function getExpectedBufferLength();
+    abstract protected function getExpectedBufferLength(): int;
 
     /**
      * Gets the expected length of the frame payload.
      *
      * @return int
      */
-    protected function getBufferLength()
+    protected function getBufferLength(): int
     {
         return \strlen($this->buffer);
     }
 
     /**
-     * Gets the contents of the frame payload
+     * Gets the contents of the frame payload.
+     *
      * The frame must be complete to call this method.
      *
      * @throws FrameException
-     *
-     * @return string
      */
-    public function getFramePayload()
+    public function getFramePayload(): string
     {
         if (!$this->isComplete()) {
             throw new FrameException('Cannot get payload: frame is not complete');
@@ -147,10 +133,8 @@ abstract class Frame
 
     /**
      * Whether the frame is complete.
-     *
-     * @return bool
      */
-    public function isComplete()
+    public function isComplete(): bool
     {
         if (!$this->buffer) {
             return false;
@@ -171,14 +155,13 @@ abstract class Frame
     abstract protected function decodeFramePayloadFromBuffer(): void;
 
     /**
-     * Gets the contents of the frame buffer
+     * Gets the binary contents of the frame buffer.
+     *
      * This is the encoded value, receieved into the frame with receiveData().
      *
      * @throws FrameException
-     *
-     * @return string binary
      */
-    public function getFrameBuffer()
+    public function getFrameBuffer(): string
     {
         if (!$this->buffer && $this->payload) {
             throw new FrameException('Cannot get frame buffer');

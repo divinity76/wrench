@@ -32,16 +32,12 @@ class Connection extends Configurable implements LoggerAwareInterface
     use LoggerAwareTrait;
 
     /**
-     * The connection manager.
-     *
      * @var ConnectionManager
      */
     protected $manager;
 
     /**
-     * Socket object.
-     *
-     * Wraps the client connection resource
+     * Wraps the client connection resource.
      *
      * @var ServerClientSocket
      */
@@ -312,9 +308,8 @@ class Connection extends Configurable implements LoggerAwareInterface
     public function process(): void
     {
         $data = $this->socket->receive();
-        $bytes = \strlen($data);
 
-        if (0 === $bytes || false === $data) {
+        if ('' === $data) {
             throw new CloseException('Error reading data from socket: '.$this->socket->getLastError());
         }
 
@@ -340,13 +335,11 @@ class Connection extends Configurable implements LoggerAwareInterface
     /**
      * Performs a websocket handshake.
      *
-     * @param string $data
-     *
      * @throws BadRequestException
      * @throws HandshakeException
      * @throws WrenchException
      */
-    public function handshake($data): void
+    public function handshake(string $data): void
     {
         try {
             list($path, $origin, $key, $extensions, $protocol, $headers, $params)

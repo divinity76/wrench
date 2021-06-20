@@ -35,8 +35,6 @@ abstract class Configurable
 
     /**
      * Configures the options.
-     *
-     * @param array $options
      */
     protected function configure(array $options): void
     {

@@ -28,8 +28,8 @@ abstract class SocketBaseTest extends BaseTest
      */
     public function testGetNamePart($name, $ip, $port): void
     {
-        $this->assertEquals($ip, Socket::getNamePart($name, Socket::NAME_PART_IP), 'splits ip correctly');
-        $this->assertEquals($port, Socket::getNamePart($name, Socket::NAME_PART_PORT), 'splits port correctly');
+        $this->assertEquals($ip, AbstractSocket::getNamePart($name, AbstractSocket::NAME_PART_IP), 'splits ip correctly');
+        $this->assertEquals($port, AbstractSocket::getNamePart($name, AbstractSocket::NAME_PART_PORT), 'splits port correctly');
     }
 
     /**

@@ -5,6 +5,7 @@ namespace Wrench;
 use Countable;
 use Exception;
 use InvalidArgumentException;
+use TypeError;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
@@ -19,6 +20,7 @@ use Wrench\Protocol\Protocol;
 use Wrench\Socket\ServerClientSocket;
 use Wrench\Socket\ServerSocket;
 use Wrench\Util\Configurable;
+use Socket;
 
 class ConnectionManager extends Configurable implements Countable, LoggerAwareInterface
 {
@@ -49,7 +51,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * An array of raw socket resources, corresponding to connections, roughly.
      *
-     * @var array<int, resource>
+     * @var array<int, resource|Socket>
      */
     protected $resources = [];
 
@@ -64,7 +66,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * @see Countable::count()
      */
-    public function count()
+    public function count(): int
     {
         return \count($this->connections);
     }
@@ -74,7 +76,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      *
      * @return BinaryDataHandlerInterface|ConnectionHandlerInterface|DataHandlerInterface|UpdateHandlerInterface|null
      */
-    public function getApplicationForPath(string $path)
+    public function getApplicationForPath(string $path): ?object
     {
         $path = \ltrim($path, '/');
 
@@ -85,8 +87,6 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      * Listens on the main socket.
      *
      * @throws ConnectionException
-     *
-     * @return void
      */
     public function listen(): void
     {
@@ -122,8 +122,6 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
 
     /**
      * Process events on the master socket ($this->socket).
-     *
-     * @return void
      */
     protected function processMasterSocket(): void
     {
@@ -150,14 +148,14 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      * instance and its associated socket resource are then stored in the
      * manager.
      *
-     * @param resource $resource A socket resource
-     *
-     * @return Connection
+     * @param resource|Socket $resource A socket resource
      */
     protected function createConnection($resource): Connection
     {
-        if (!$resource || !\is_resource($resource)) {
-            throw new InvalidArgumentException('Invalid connection resource');
+        if (!\is_resource($resource) && !$resource instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource))
+            );
         }
 
         $socket_class = $this->options['socket_client_class'];
@@ -186,15 +184,24 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      * true in most circumstances, but may not be guaranteed.
      * This method (and $this->getResourceId()) exist to make this assumption
      * explicit.
+     *
      * This is needed on the connection manager as well as on resources.
      *
-     * @param resource $resource
-     *
-     * @return int
+     * @param resource|Socket $resource
      */
     protected function resourceId($resource): int
     {
-        return \get_resource_id($resource);
+        if (!\is_resource($resource) && !$resource instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource))
+            );
+        }
+
+        if (\is_resource($resource)) {
+            return \get_resource_id($resource);
+        }
+
+        return \spl_object_id($resource);
     }
 
     /**
@@ -204,6 +211,12 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      */
     protected function processClientSocket($socket): void
     {
+        if (!\is_resource($socket) && !$socket instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
+            );
+        }
+
         $connection = $this->getConnectionForClientSocket($socket);
 
         if (!$connection) {
@@ -237,19 +250,21 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * Returns the Connection associated with the specified socket resource.
      *
-     * @param resource $socket
-     *
-     * @return Connection|null
+     * @param resource|Socket $socket
      */
     protected function getConnectionForClientSocket($socket): ?Connection
     {
+        if (!\is_resource($socket) && !$socket instanceof Socket) {
+            throw new TypeError(
+                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
+            );
+        }
+
         return $this->connections[$this->resourceId($socket)] ?? null;
     }
 
     /**
      * Gets the connection manager's listening URI.
-     *
-     * @return string
      */
     public function getUri(): string
     {
@@ -266,20 +281,14 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
 
     /**
      * Removes a connection.
-     *
-     * @param Connection $connection
      */
     public function removeConnection(Connection $connection): void
     {
         $socket = $connection->getSocket();
 
-        if ($socket->getResource()) {
-            $index = $socket->getResourceId();
-        } else {
-            $index = \array_search($connection, $this->connections);
-        }
+        $index = $socket->getResourceId() ?? \array_search($connection, $this->connections);
 
-        if (!$index) {
+        if (false === $index) {
             $this->logger->warning('Could not remove connection: not found');
         }
 
@@ -329,7 +338,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * Gets all resources.
      *
-     * @return array<int, resource>
+     * @return array<int, resource|Socket>
      */
     protected function getAllResources(): array
     {

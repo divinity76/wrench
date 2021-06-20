@@ -2,12 +2,14 @@
 
 namespace Wrench;
 
+use Socket;
+
 interface ResourceInterface
 {
-    public function getResourceId(): int;
+    public function getResourceId(): ?int;
 
     /**
-     * @return resource
+     * @return resource|Socket|null
      */
     public function getResource();
 }
