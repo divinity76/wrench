@@ -5,10 +5,11 @@ namespace Wrench;
 use Countable;
 use Exception;
 use InvalidArgumentException;
-use TypeError;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use Socket;
+use TypeError;
 use Wrench\Application\BinaryDataHandlerInterface;
 use Wrench\Application\ConnectionHandlerInterface;
 use Wrench\Application\DataHandlerInterface;
@@ -20,7 +21,6 @@ use Wrench\Protocol\Protocol;
 use Wrench\Socket\ServerClientSocket;
 use Wrench\Socket\ServerSocket;
 use Wrench\Util\Configurable;
-use Socket;
 
 class ConnectionManager extends Configurable implements Countable, LoggerAwareInterface
 {
@@ -153,9 +153,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     protected function createConnection($resource): Connection
     {
         if (!\is_resource($resource) && !$resource instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource)));
         }
 
         $socket_class = $this->options['socket_client_class'];
@@ -192,9 +190,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     protected function resourceId($resource): int
     {
         if (!\is_resource($resource) && !$resource instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource)));
         }
 
         if (\is_resource($resource)) {
@@ -212,9 +208,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     protected function processClientSocket($socket): void
     {
         if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
         }
 
         $connection = $this->getConnectionForClientSocket($socket);
@@ -255,9 +249,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     protected function getConnectionForClientSocket($socket): ?Connection
     {
         if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
         }
 
         return $this->connections[$this->resourceId($socket)] ?? null;

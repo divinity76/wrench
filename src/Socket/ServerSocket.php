@@ -2,8 +2,8 @@
 
 namespace Wrench\Socket;
 
-use Wrench\Exception\ConnectionException;
 use Socket;
+use Wrench\Exception\ConnectionException;
 
 /**
  * Server socket.

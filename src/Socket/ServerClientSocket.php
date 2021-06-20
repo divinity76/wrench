@@ -2,8 +2,8 @@
 
 namespace Wrench\Socket;
 
-use TypeError;
 use Socket;
+use TypeError;
 
 class ServerClientSocket extends AbstractSocket
 {
@@ -16,9 +16,7 @@ class ServerClientSocket extends AbstractSocket
     public function __construct($accepted_socket, array $options = [])
     {
         if (null !== $accepted_socket && !\is_resource($accepted_socket) && !$accepted_socket instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($accepted_socket) must be of type %s, %s given', __METHOD__, 'resource|Socket|null', \get_debug_type($accepted_socket))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($accepted_socket) must be of type %s, %s given', __METHOD__, 'resource|Socket|null', \get_debug_type($accepted_socket)));
         }
 
         parent::__construct($options);

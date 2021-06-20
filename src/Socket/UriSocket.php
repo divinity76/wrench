@@ -2,8 +2,8 @@
 
 namespace Wrench\Socket;
 
-use Wrench\Protocol\Protocol;
 use Socket;
+use Wrench\Protocol\Protocol;
 
 abstract class UriSocket extends AbstractSocket
 {

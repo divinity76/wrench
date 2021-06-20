@@ -5,12 +5,12 @@ namespace Wrench\Listener;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
+use Socket;
 use TypeError;
 use Wrench\Connection;
+use Wrench\Protocol\Protocol;
 use Wrench\Server;
 use Wrench\Util\Configurable;
-use Wrench\Protocol\Protocol;
-use Socket;
 
 class RateLimiter extends Configurable implements ListenerInterface, LoggerAwareInterface
 {
@@ -70,9 +70,7 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
     public function onSocketConnect($socket, Connection $connection): void
     {
         if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
         }
 
         $this->checkConnections($connection);
@@ -136,9 +134,7 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
     public function onSocketDisconnect($socket, Connection $connection): void
     {
         if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
         }
 
         $this->releaseConnection($connection);
@@ -172,9 +168,7 @@ class RateLimiter extends Configurable implements ListenerInterface, LoggerAware
     public function onClientData($socket, Connection $connection): void
     {
         if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(
-                sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket))
-            );
+            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
         }
 
         $this->checkRequestsPerMinute($connection);

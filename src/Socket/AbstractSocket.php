@@ -3,10 +3,10 @@
 namespace Wrench\Socket;
 
 use InvalidArgumentException;
+use Socket;
 use Wrench\Exception\SocketException;
 use Wrench\ResourceInterface;
 use Wrench\Util\Configurable;
-use Socket;
 
 /**
  * Socket class

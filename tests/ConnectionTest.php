@@ -6,8 +6,8 @@ use PHPUnit\Framework\ExpectationFailedException;
 use Wrench\Application\DataHandlerInterface;
 use Wrench\Exception\HandshakeException;
 use Wrench\Protocol\Protocol;
-use Wrench\Socket\ServerClientSocket;
 use Wrench\Socket\AbstractSocket;
+use Wrench\Socket\ServerClientSocket;
 use Wrench\Test\BaseTest;
 
 /**
