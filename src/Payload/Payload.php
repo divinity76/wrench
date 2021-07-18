@@ -10,7 +10,6 @@ use Wrench\Protocol\Protocol;
 use Wrench\Socket\AbstractSocket;
 
 /**
- * Payload class
  * Represents a WebSocket protocol payload, which may be made up of multiple
  * frames.
  */
@@ -122,8 +121,8 @@ abstract class Payload
 
         foreach ($this->frames as $frame) {
             $success = $success && (
-                    null !== $socket->send($frame->getFrameBuffer())
-                );
+                null !== $socket->send($frame->getFrameBuffer())
+            );
         }
 
         return $success;

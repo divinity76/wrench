@@ -222,7 +222,7 @@ class ConnectionTest extends BaseTest
 
         $application = $this->getMockApplication();
 
-        $application->expects($this->exactly(isset($counts['onData']) ? $counts['onData'] : 0))
+        $application->expects($this->exactly($counts['onData'] ?? 0))
             ->method('onData')
             ->will($this->returnValue(true));
 
@@ -237,7 +237,7 @@ class ConnectionTest extends BaseTest
             ->with($path)
             ->will($this->returnValue($application));
 
-        $manager->expects($this->exactly(isset($counts['removeConnection']) ? $counts['removeConnection'] : 0))
+        $manager->expects($this->exactly($counts['removeConnection'] ?? 0))
             ->method('removeConnection');
 
         $manager->expects($this->any())

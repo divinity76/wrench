@@ -22,7 +22,7 @@ abstract class ProtocolBaseTest extends BaseTest
     public function testValidatHandshakeRequestValid($request): void
     {
         try {
-            list($path, $origin, $key, $extensions, $protocol) = $this->getInstance()->validateRequestHandshake($request);
+            [$path, $origin, $key, $extensions, $protocol] = $this->getInstance()->validateRequestHandshake($request);
 
             $this->assertEquals('/chat', $path);
             $this->assertEquals('http://example.com', $origin);

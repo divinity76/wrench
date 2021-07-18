@@ -5,7 +5,7 @@ namespace Wrench\Protocol;
 /**
  * This is the version of websockets used by Chrome versions 17 through 19.
  *
- * @see http://tools.ietf.org/html/rfc6455
+ * @see https://datatracker.ietf.org/doc/html/rfc6455
  */
 class Rfc6455Protocol extends HybiProtocol
 {

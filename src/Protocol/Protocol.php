@@ -9,8 +9,9 @@ use Wrench\Exception\HandshakeException;
 use Wrench\Payload\Payload;
 
 /**
- * Definitions and implementation helpers for the Wrenchs protocol
- * Based on RFC 6455: http://tools.ietf.org/html/rfc6455.
+ * Definitions and implementation helpers for the Wrenchs protocol.
+ *
+ * @see https://datatracker.ietf.org/doc/html/rfc6455
  */
 abstract class Protocol
 {
@@ -50,7 +51,7 @@ abstract class Protocol
     /**
      * Close statuses.
      *
-     * @see http://tools.ietf.org/html/rfc6455#section-7.4
+     * @see https://datatracker.ietf.org/doc/html/rfc6455#section-7.4
      */
     public const CLOSE_NORMAL = 1000;
     public const CLOSE_GOING_AWAY = 1001;
@@ -221,7 +222,7 @@ abstract class Protocol
             throw new InvalidArgumentException('You must supply a URI, key and origin');
         }
 
-        list($scheme, $host, $port, $path, $query) = self::validateUri($uri);
+        [$scheme, $host, $port, $path, $query] = self::validateUri($uri);
 
         if ($query) {
             $path .= '?'.$query;
@@ -395,7 +396,7 @@ abstract class Protocol
      * Note that the protocol calls for the base64 encoded value to be hashed,
      * not the original 16 byte random key.
      *
-     * @see http://tools.ietf.org/html/rfc6455#section-4.2.2
+     * @see https://datatracker.ietf.org/doc/html/rfc6455#section-4.2.2
      *
      * @param string $encoded_key
      *
@@ -495,13 +496,13 @@ abstract class Protocol
             $parts[] = '';
         }
 
-        list($headers, $body) = $parts;
+        [$headers, $body] = $parts;
 
         $return = [];
         foreach (\explode("\r\n", $headers) as $header) {
             $parts = \explode(': ', $header, 2);
             if (2 == \count($parts)) {
-                list($name, $value) = $parts;
+                [$name, $value] = $parts;
                 if (!isset($return[$name])) {
                     $return[$name] = $value;
                 } else {
@@ -538,13 +539,13 @@ abstract class Protocol
      */
     public function validateRequestHandshake(string $request): array
     {
-        list($request, $headers) = $this->getRequestHeaders($request);
+        [$request, $headers] = $this->getRequestHeaders($request);
         // make a copy of the headers array to store all extra headers
         $extraHeaders = $headers;
 
         // parse the resulting url to separate query parameters from the path
         $url = \parse_url($this->validateRequestLine($request));
-        $path = isset($url['path']) ? $url['path'] : null;
+        $path = $url['path'] ?? null;
         $urlParams = [];
         if (isset($url['query'])) {
             \parse_str($url['query'], $urlParams);

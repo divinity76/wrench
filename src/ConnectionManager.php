@@ -8,8 +8,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
-use Socket;
-use TypeError;
 use Wrench\Application\BinaryDataHandlerInterface;
 use Wrench\Application\ConnectionHandlerInterface;
 use Wrench\Application\DataHandlerInterface;
@@ -51,7 +49,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * An array of raw socket resources, corresponding to connections, roughly.
      *
-     * @var array<int, resource|Socket>
+     * @var array<int, resource>
      */
     protected $resources = [];
 
@@ -148,14 +146,10 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      * instance and its associated socket resource are then stored in the
      * manager.
      *
-     * @param resource|Socket $resource A socket resource
+     * @param resource $resource A socket resource
      */
     protected function createConnection($resource): Connection
     {
-        if (!\is_resource($resource) && !$resource instanceof Socket) {
-            throw new TypeError(\sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource)));
-        }
-
         $socket_class = $this->options['socket_client_class'];
         $socket_options = $this->options['socket_client_options'];
 
@@ -185,14 +179,10 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      *
      * This is needed on the connection manager as well as on resources.
      *
-     * @param resource|Socket $resource
+     * @param resource $resource
      */
     protected function resourceId($resource): int
     {
-        if (!\is_resource($resource) && !$resource instanceof Socket) {
-            throw new TypeError(\sprintf('%s(): Argument #1 ($resource) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($resource)));
-        }
-
         if (\is_resource($resource)) {
             return \get_resource_id($resource);
         }
@@ -207,10 +197,6 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
      */
     protected function processClientSocket($socket): void
     {
-        if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
-        }
-
         $connection = $this->getConnectionForClientSocket($socket);
 
         if (!$connection) {
@@ -244,14 +230,10 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * Returns the Connection associated with the specified socket resource.
      *
-     * @param resource|Socket $socket
+     * @param resource $socket
      */
     protected function getConnectionForClientSocket($socket): ?Connection
     {
-        if (!\is_resource($socket) && !$socket instanceof Socket) {
-            throw new TypeError(\sprintf('%s(): Argument #1 ($socket) must be of type %s, %s given', __METHOD__, 'resource|Socket', \get_debug_type($socket)));
-        }
-
         return $this->connections[$this->resourceId($socket)] ?? null;
     }
 
@@ -330,7 +312,7 @@ class ConnectionManager extends Configurable implements Countable, LoggerAwareIn
     /**
      * Gets all resources.
      *
-     * @return array<int, resource|Socket>
+     * @return array<int, resource>
      */
     protected function getAllResources(): array
     {

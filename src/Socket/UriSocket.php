@@ -2,7 +2,6 @@
 
 namespace Wrench\Socket;
 
-use Socket;
 use Wrench\Protocol\Protocol;
 
 abstract class UriSocket extends AbstractSocket
@@ -29,7 +28,7 @@ abstract class UriSocket extends AbstractSocket
     {
         parent::__construct($options);
 
-        list($this->scheme, $this->host, $this->port)
+        [$this->scheme, $this->host, $this->port]
             = $this->protocol->validateSocketUri($uri);
     }
 
@@ -70,7 +69,7 @@ abstract class UriSocket extends AbstractSocket
     /**
      * Gets a stream context.
      *
-     * @return resource|Socket
+     * @return resource
      */
     protected function getStreamContext(bool $listen = false)
     {

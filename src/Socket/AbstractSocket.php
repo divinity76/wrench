@@ -31,7 +31,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
     public const NAME_PART_PORT = 1;
 
     /**
-     * @var resource|Socket|null
+     * @var resource|null
      */
     protected $socket = null;
 
@@ -177,7 +177,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
     }
 
     /**
-     * @return resource|Socket|null
+     * @return resource|null
      */
     public function getResource()
     {

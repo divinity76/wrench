@@ -56,7 +56,7 @@ abstract class Frame
      *
      * @return static
      */
-    abstract public function encode(string $data, int $type = Protocol::TYPE_TEXT, bool $masked = false): self;
+    abstract public function encode(string $payload, int $type = Protocol::TYPE_TEXT, bool $masked = false): self;
 
     /**
      * Whether the frame is the final one in a continuation.

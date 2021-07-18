@@ -3,7 +3,7 @@
 namespace Wrench\Protocol;
 
 /**
- * @see http://tools.ietf.org/html/draft-ietf-hybi-thewebsocketprotocol-10
+ * @see https://datatracker.ietf.org/doc/html/rfc6455
  */
 class Hybi10Protocol extends HybiProtocol
 {

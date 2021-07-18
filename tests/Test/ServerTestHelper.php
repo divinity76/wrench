@@ -63,7 +63,7 @@ class ServerTestHelper implements LoggerAwareInterface
 
                 if (0 === $return) {
                     foreach ($processes as $process) {
-                        list($pid, $ppid) = \explode(' ', \str_replace('  ', ' ', $process));
+                        [$pid, $ppid] = \explode(' ', \str_replace('  ', ' ', $process));
                         if ($pid) {
                             $this->logger->info('Killing '.$pid);
                             \exec('kill '.$pid.' > /dev/null 2>&1');

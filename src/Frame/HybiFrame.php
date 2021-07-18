@@ -67,7 +67,7 @@ class HybiFrame extends Frame
      *
      * @return static
      */
-    public function encode(string $payload, int $type = Protocol::TYPE_TEXT, bool $masked = false): self
+    public function encode(string $payload, int $type = Protocol::TYPE_TEXT, bool $masked = false): Frame
     {
         if (!\is_int($type) || !\in_array($type, Protocol::FRAME_TYPES)) {
             throw new InvalidArgumentException('Invalid frame type');

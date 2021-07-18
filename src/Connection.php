@@ -342,7 +342,7 @@ class Connection extends Configurable implements LoggerAwareInterface
     public function handshake(string $data): void
     {
         try {
-            list($path, $origin, $key, $extensions, $protocol, $headers, $params)
+            [$path, $origin, $key, $extensions, $protocol, $headers, $params]
                 = $this->protocol->validateRequestHandshake($data);
 
             $this->headers = $headers;

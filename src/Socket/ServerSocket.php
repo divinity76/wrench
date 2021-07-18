@@ -2,7 +2,6 @@
 
 namespace Wrench\Socket;
 
-use Socket;
 use Wrench\Exception\ConnectionException;
 
 /**
@@ -49,7 +48,7 @@ class ServerSocket extends UriSocket
      *
      * @throws ConnectionException
      *
-     * @return resource|Socket
+     * @return resource
      */
     public function accept()
     {
