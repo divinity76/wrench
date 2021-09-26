@@ -146,7 +146,7 @@ abstract class PayloadBaseTest extends BaseTest
             ],
             [
                 Protocol::TYPE_TEXT,
-                \pack('CCCCCCC', 0x00, 0x01, 0x02, 0x03, 0x04, 0xff, 0xf0),
+                \pack('CCCCCCC', 0x00, 0x01, 0x02, 0x03, 0x04, 0xFF, 0xF0),
             ],
             [Protocol::TYPE_TEXT, ' '],
         ];

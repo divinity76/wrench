@@ -13,11 +13,11 @@ class HybiFrame extends Frame
     public const BITFIELD_RSV1 = 0x40;
     public const BITFIELD_RSV2 = 0x20;
     public const BITFIELD_RSV3 = 0x10;
-    public const BITFIELD_TYPE = 0x0f;
+    public const BITFIELD_TYPE = 0x0F;
 
     // Second byte
     public const BITFIELD_MASKED = 0x80;
-    public const BITFIELD_INITIAL_LENGTH = 0x7f;
+    public const BITFIELD_INITIAL_LENGTH = 0x7F;
 
     // The inital byte offset before
     public const BYTE_HEADER = 0;
