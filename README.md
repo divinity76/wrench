@@ -35,12 +35,12 @@ $app = new class implements \Wrench\Application\DataHandlerInterface
 };
 
 // A websocket server, listening on port 8000
-$server = new \Wrench\BasicServer('ws://localhost:8000', array(
-    'allowed_origins' => array(
+$server = new \Wrench\BasicServer('ws://localhost:8000', [
+    'allowed_origins' => [
         'mysite.com',
         'mysite.dev.localdomain'
-    )
-));
+    ],
+]);
 
 $server->registerApplication('echo', $app);
 $server->registerApplication('chat', new \My\ChatApplication());
@@ -53,7 +53,7 @@ $server->run();
 ```php
 // A client side example, that sends a string and will receive
 // the data back to the connection that sent it
-$client = new Client('ws://localhost:8000, http://localhost:8000);
+$client = new Client('ws://localhost:8000', 'http://localhost:8000');
 $client->connect();
 $client->sendData('hello');
 $response = $client->receive()[0]->getPayload();
