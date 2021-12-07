@@ -281,6 +281,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
                 // Continue if more data to be read
                 $metadata = \stream_get_meta_data($this->socket);
 
+                /** @phpstan-ignore-next-line */
                 if (isset($metadata['unread_bytes'])) {
                     if (!$metadata['unread_bytes']) {
                         // stop it, if we read a full message in previous time

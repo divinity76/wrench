@@ -53,7 +53,7 @@ class Connection extends Configurable implements LoggerAwareInterface
     /**
      * The application this connection belongs to.
      *
-     * @var DataHandlerInterface|ConnectionHandlerInterface|UpdateHandlerInterface
+     * @var DataHandlerInterface|ConnectionHandlerInterface|UpdateHandlerInterface|null
      */
     protected $application = null;
 
