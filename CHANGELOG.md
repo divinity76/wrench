@@ -1,6 +1,11 @@
 # CHANGELOG
 
 
-## 1.0.0
+## 1.1.0 (UPCOMING)
 
-* Upcoming
+* Added support for `psr/log` 2 and 3
+
+
+## 1.0.0 (2021-08-15)
+
+* Initial release
