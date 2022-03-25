@@ -650,7 +650,9 @@ abstract class Protocol
      */
     protected function validateRequestLine(string $line): string
     {
-        if (!\preg_match(self::REQUEST_LINE_REGEX, $line, $matches) || !($matches[1] ?? false)) {
+        \preg_match(self::REQUEST_LINE_REGEX, $line, $matches);
+
+        if (!($matches[1] ?? false)) {
             throw new BadRequestException('Invalid request line', 400);
         }
 
