@@ -33,7 +33,7 @@ $logger = new class() extends \Psr\Log\AbstractLogger implements Psr\Log\LoggerI
  * Our websocket server.
  */
 $server = new \Wrench\Server('ws://localhost:8000/', [
-    //'logger' => $logger,
+    // 'logger' => $logger,
     'allowed_origins' => [
         'mysite.localhost',
     ],

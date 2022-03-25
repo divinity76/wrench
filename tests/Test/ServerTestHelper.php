@@ -94,7 +94,7 @@ class ServerTestHelper implements LoggerAwareInterface
      */
     public function log($message, $priority = 'info'): void
     {
-        //echo $message . "\n";
+        // echo $message . "\n";
     }
 
     /**
