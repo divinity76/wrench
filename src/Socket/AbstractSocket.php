@@ -251,10 +251,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
                     $makeBlockingAfterRead = false;
                 }
 
-                // fread FALSE means socket has been closed
                 if (false === $result) {
-                    $this->disconnect();
-
                     return $buffer;
                 }
 
