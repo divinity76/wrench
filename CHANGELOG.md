@@ -1,6 +1,11 @@
 # CHANGELOG
 
 
+## 1.2.0 (2022-04-30)
+
+* Official support for PHP 8.1
+
+
 ## 1.1.0 (2021-12-07)
 
 * Added support for `psr/log` 2 and 3
