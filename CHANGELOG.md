@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## 1.3.0 (UPCOMING)
+## 1.3.0 (2022-08-28)
 
 * Official support for PHP 8.2
 
