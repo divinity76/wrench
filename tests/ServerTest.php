@@ -5,32 +5,23 @@ namespace Wrench;
 use Wrench\Test\BaseTest;
 use Wrench\Util\LoopInterface;
 
-/**
- * Tests the Server class.
- */
 class ServerTest extends BaseTest
 {
     /**
-     * Tests the constructor.
-     *
-     * @param string $url
-     * @param array  $options
      * @dataProvider getValidConstructorArguments
      */
-    public function testConstructor($url, array $options = []): void
+    public function testConstructor(string $url, array $options = []): void
     {
         $this->assertInstanceOfClass(
-            $this->getInstance($url, $options),
+            self::getInstance($url, $options),
             'Valid constructor arguments'
         );
     }
 
     /**
-     * Data provider.
-     *
      * @return array<array<mixed>>
      */
-    public function getValidConstructorArguments()
+    public static function getValidConstructorArguments(): array
     {
         return [
             [

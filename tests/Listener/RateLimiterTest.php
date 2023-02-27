@@ -3,15 +3,25 @@
 namespace Wrench\Listener;
 
 use Wrench\Connection;
+use Wrench\Server;
+use Wrench\Test\BaseTest;
 
-class RateLimiterTest extends ListenerBaseTest
+class RateLimiterTest extends BaseTest
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
-        $instance = $this->getInstance();
+        $instance = self::getInstance();
         $this->assertInstanceOfClass($instance, 'No constructor arguments');
+    }
 
-        return $instance;
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testListen(): void
+    {
+        $instance = self::getInstance([]);
+        $server = $this->createMock(Server::class);
+        $instance->listen($server);
     }
 
     /**
@@ -22,13 +32,13 @@ class RateLimiterTest extends ListenerBaseTest
         $handle = \tmpfile();
 
         try {
-            $this->getInstance()->onSocketConnect($handle, $this->getConnection());
+            self::getInstance()->onSocketConnect($handle, $this->getConnection());
         } finally {
             \fclose($handle);
         }
     }
 
-    protected function getConnection()
+    protected function getConnection(): Connection
     {
         $connection = $this->createMock(Connection::class);
 
@@ -61,7 +71,7 @@ class RateLimiterTest extends ListenerBaseTest
         $handle = \tmpfile();
 
         try {
-            $this->getInstance()->onSocketDisconnect($handle, $this->getConnection());
+            self::getInstance()->onSocketDisconnect($handle, $this->getConnection());
         } finally {
             \fclose($handle);
         }
@@ -75,7 +85,7 @@ class RateLimiterTest extends ListenerBaseTest
         $handle = \tmpfile();
 
         try {
-            $this->getInstance()->onClientData($handle, $this->getConnection());
+            self::getInstance()->onClientData($handle, $this->getConnection());
         } finally {
             \fclose($handle);
         }

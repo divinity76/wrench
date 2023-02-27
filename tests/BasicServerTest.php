@@ -4,19 +4,14 @@ namespace Wrench;
 
 use Psr\Log\NullLogger;
 
-/**
- * Tests the BasicServer class.
- */
 class BasicServerTest extends ServerTest
 {
     /**
-     * @param array  $allowed
-     * @param string $origin
      * @dataProvider getValidOrigins
      */
-    public function testValidOriginPolicy(array $allowed, $origin): void
+    public function testValidOriginPolicy(array $allowed, string $origin): void
     {
-        $server = $this->getInstance('ws://localhost:8000', [
+        $server = self::getInstance('ws://localhost:8000', [
             'allowed_origins' => $allowed,
             'logger' => new NullLogger(),
         ]);
@@ -37,13 +32,11 @@ class BasicServerTest extends ServerTest
     }
 
     /**
-     * @param array  $allowed
-     * @param string $origin
      * @dataProvider getInvalidOrigins
      */
-    public function testInvalidOriginPolicy(array $allowed, $origin): void
+    public function testInvalidOriginPolicy(array $allowed, string $origin): void
     {
-        $server = $this->getInstance('ws://localhost:8000', [
+        $server = self::getInstance('ws://localhost:8000', [
             'allowed_origins' => $allowed,
             'logger' => new NullLogger(),
         ]);
@@ -66,7 +59,7 @@ class BasicServerTest extends ServerTest
     /**
      * @see \Wrench\ServerTest::getValidConstructorArguments()
      */
-    public function getValidConstructorArguments()
+    public static function getValidConstructorArguments(): array
     {
         return \array_merge(parent::getValidConstructorArguments(), [
             [
@@ -77,11 +70,9 @@ class BasicServerTest extends ServerTest
     }
 
     /**
-     * Data provider.
-     *
      * @return array<array<mixed>>
      */
-    public function getValidOrigins()
+    public static function getValidOrigins(): array
     {
         return [
             [['localhost'], 'localhost'],
@@ -90,11 +81,9 @@ class BasicServerTest extends ServerTest
     }
 
     /**
-     * Data provider.
-     *
      * @return array<array<mixed>>
      */
-    public function getInvalidOrigins()
+    public static function getInvalidOrigins(): array
     {
         return [
             [['localhost'], 'blah'],

@@ -9,14 +9,12 @@ use Wrench\Exception\SocketException;
 use Wrench\Protocol\Rfc6455Protocol;
 use Wrench\Test\ServerTestHelper;
 
-class ClientSocketTest extends UriSocketTest
+class ClientSocketTest extends UriSocketBaseTest
 {
-    /**
-     * Overridden to use with the depends annotation.
-     */
-    public function testConstructor()
+    public function testConstructor(): void
     {
-        $instance = parent::testConstructor();
+        $instance = self::getInstance('ws://localhost:8000');
+        $this->assertInstanceOfClass($instance);
 
         $socket = null;
 
@@ -39,8 +37,6 @@ class ClientSocketTest extends UriSocketTest
             new ClientSocket('ws://localhost:8000/foo'),
             'specified port'
         );
-
-        return $instance;
     }
 
     public function testOptions(): void
@@ -104,11 +100,10 @@ class ClientSocketTest extends UriSocketTest
         new ClientSocket('Bad argument');
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testSendTooEarly($instance): void
+    public function testSendTooEarly(): void
     {
+        $instance = self::getInstance('ws://localhost:8000');
+
         $this->expectException(SocketException::class);
 
         $instance->send('foo');
@@ -123,10 +118,10 @@ class ClientSocketTest extends UriSocketTest
             $helper = new ServerTestHelper();
             $helper->setUp();
 
-            $instance = $this->getInstance($helper->getConnectionString());
+            $instance = self::getInstance($helper->getConnectionString());
             $success = $instance->connect();
 
-            $this->assertTrue($success, 'Client socket can connect to test server');
+            self::assertTrue($success, 'Client socket can connect to test server');
 
             $sent = $instance->send("GET /echo HTTP/1.1\r
 Host: localhost\r
@@ -135,10 +130,10 @@ Connection: Upgrade\r
 Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r
 Origin: http://localhost\r
 Sec-WebSocket-Version: 13\r\n\r\n");
-            $this->assertNotEquals(false, $sent, 'Client socket can send to test server');
+            self::assertNotEquals(false, $sent, 'Client socket can send to test server');
 
             $response = $instance->receive();
-            $this->assertStringStartsWith('HTTP', $response, 'Response looks like HTTP handshake response');
+            self::assertStringStartsWith('HTTP', $response, 'Response looks like HTTP handshake response');
         } catch (\Exception $e) {
             $helper->tearDown();
             throw $e;

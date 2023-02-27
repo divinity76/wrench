@@ -5,51 +5,38 @@ namespace Wrench;
 use Wrench\Application\DataHandlerInterface;
 use Wrench\Test\BaseTest;
 
-/**
- * Tests the ConnectionManager class.
- */
 class ConnectionManagerTest extends BaseTest
 {
-    /**
-     * Tests the constructor.
-     *
-     * @dataProvider getValidConstructorArguments
-     */
-    public function testValidConstructorArguments($server, array $options): void
+    public function testValidConstructorArguments(): void
     {
         $this->assertInstanceOfClass(
-            $instance = $this->getInstance(
-                $server,
-                $options
+            $instance = self::getInstance(
+                $this->getMockServer(),
+                []
             ),
             'Valid constructor arguments'
         );
     }
 
-    /**
-     * Tests the constructor.
-     */
-    public function testConstructor()
+    public function testConstructor(): void
     {
         $this->assertInstanceOfClass(
-            $instance = $this->getInstance(
+            self::getInstance(
                 $this->getMockServer(),
                 []
             ),
             'Constructor'
         );
-
-        return $instance;
     }
 
     /**
-     * Gets a mock server.
+     * @return \PHPUnit_Framework_MockObject_MockObject&Server
      */
-    protected function getMockServer()
+    private function getMockServer(): Server
     {
         $server = $this->createMock(Server::class);
 
-        $server->registerApplication('/echo', $this->getMockApplication());
+        $server->registerApplication('/echo', self::getMockApplication());
 
         $server->expects($this->any())
             ->method('getUri')
@@ -58,12 +45,7 @@ class ConnectionManagerTest extends BaseTest
         return $server;
     }
 
-    /**
-     * Gets a mock application.
-     *
-     * @return EchoApplication
-     */
-    protected function getMockApplication()
+    private static function getMockApplication(): DataHandlerInterface
     {
         return new class() implements DataHandlerInterface {
             public function onData(string $data, Connection $connection): void
@@ -73,23 +55,13 @@ class ConnectionManagerTest extends BaseTest
         };
     }
 
-    /**
-     * @depends testConstructor
-     *
-     * @param ConnectionManager $instance
-     */
-    public function testCount($instance): void
+    public function testCount(): void
     {
-        $this->assertTrue(\is_numeric($instance->count()));
-    }
+        $connectionManager = self::getInstance(
+            $this->getMockServer(),
+            []
+        );
 
-    /**
-     * Data provider.
-     */
-    public function getValidConstructorArguments()
-    {
-        return [
-            [$this->getMockServer(), []],
-        ];
+        self::assertTrue(\is_numeric($connectionManager->count()));
     }
 }

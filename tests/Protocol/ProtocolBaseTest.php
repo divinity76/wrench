@@ -19,17 +19,17 @@ abstract class ProtocolBaseTest extends BaseTest
     /**
      * @dataProvider getValidHandshakeRequests
      */
-    public function testValidatHandshakeRequestValid($request): void
+    public function testValidatHandshakeRequestValid(string $request): void
     {
         try {
-            [$path, $origin, $key, $extensions, $protocol] = $this->getInstance()->validateRequestHandshake($request);
+            [$path, $origin, $key, $extensions, $protocol] = self::getInstance()->validateRequestHandshake($request);
 
-            $this->assertEquals('/chat', $path);
-            $this->assertEquals('http://example.com', $origin);
-            $this->assertEquals('dGhlIHNhbXBsZSBub25jZQ==', $key);
-            $this->assertTrue(\is_array($extensions), 'Extensions returned as array');
-            $this->assertEquals(['x-test', 'x-test2'], $extensions, 'Extensions match');
-            $this->assertEquals('chat, superchat', $protocol);
+            self::assertEquals('/chat', $path);
+            self::assertEquals('http://example.com', $origin);
+            self::assertEquals('dGhlIHNhbXBsZSBub25jZQ==', $key);
+            self::assertTrue(\is_array($extensions), 'Extensions returned as array');
+            self::assertEquals(['x-test', 'x-test2'], $extensions, 'Extensions match');
+            self::assertEquals('chat, superchat', $protocol);
         } catch (Exception $e) {
             $this->fail($e);
         }
@@ -38,12 +38,12 @@ abstract class ProtocolBaseTest extends BaseTest
     /**
      * @dataProvider getValidHandshakeResponses
      */
-    public function testValidateHandshakeResponseValid($response, $key): void
+    public function testValidateHandshakeResponseValid(string $response, string $key): void
     {
         try {
-            $valid = $this->getInstance()->validateResponseHandshake($response, $key);
-            $this->assertTrue(\is_bool($valid), 'Validation return value is boolean');
-            $this->assertTrue($valid, 'Handshake response validates');
+            $valid = self::getInstance()->validateResponseHandshake($response, $key);
+            self::assertTrue(\is_bool($valid), 'Validation return value is boolean');
+            self::assertTrue($valid, 'Handshake response validates');
         } catch (Exception $e) {
             $this->fail('Validated valid response handshake as invalid');
         }
@@ -52,53 +52,48 @@ abstract class ProtocolBaseTest extends BaseTest
     /**
      * @dataProvider getValidHandshakeResponses
      */
-    public function testGetResponseHandsake($unused, $key): void
+    public function testGetResponseHandsake(string $response, string $key): void
     {
         try {
-            $response = $this->getInstance()->getResponseHandshake($key);
-            $this->assertHttpResponse($response);
+            $response = self::getInstance()->getResponseHandshake($key);
+            self::assertHttpResponse($response);
         } catch (Exception $e) {
             $this->fail('Unable to get handshake response: '.$e);
         }
     }
 
-    /**
-     * Asserts the string response is an HTTP response.
-     *
-     * @param string $response
-     */
-    protected function assertHttpResponse($response, $message = ''): void
+    protected function assertHttpResponse(string $response, string $message = ''): void
     {
-        $this->assertStringStartsWith('HTTP', $response, $message.' - response starts well');
-        $this->assertStringEndsWith("\r\n", $response, $message.' - response ends well');
+        self::assertStringStartsWith('HTTP', $response, $message.' - response starts well');
+        self::assertStringEndsWith("\r\n", $response, $message.' - response ends well');
     }
 
     public function testGetVersion(): void
     {
-        $version = $this->getInstance()->getVersion();
-        $this->assertTrue(\is_int($version));
+        $version = self::getInstance()->getVersion();
+        self::assertTrue(\is_int($version));
     }
 
     public function testGetResponseError(): void
     {
-        $response = $this->getInstance()->getResponseError(400);
-        $this->assertHttpResponse($response, 'Code as int');
+        $response = self::getInstance()->getResponseError(400);
+        self::assertHttpResponse($response, 'Code as int');
 
-        $response = $this->getInstance()->getResponseError(new Exception('Some message', 500));
-        $this->assertHttpResponse($response, 'Code in Exception');
+        $response = self::getInstance()->getResponseError(new Exception('Some message', 500));
+        self::assertHttpResponse($response, 'Code in Exception');
 
-        $response = $this->getInstance()->getResponseError(888);
-        $this->assertHttpResponse($response, 'Invalid code produces unimplemented response');
+        $response = self::getInstance()->getResponseError(888);
+        self::assertHttpResponse($response, 'Invalid code produces unimplemented response');
     }
 
     /**
      * @dataProvider getValidOriginUris
      * @doesNotPerformAssertions
      */
-    public function testValidateOriginUriValid($uri): void
+    public function testValidateOriginUriValid(string $uri): void
     {
         try {
-            $valid = $this->getInstance()->validateOriginUri($uri);
+            $valid = self::getInstance()->validateOriginUri($uri);
         } catch (\Exception $e) {
             $this->fail('Valid URI validated as invalid: '.$e);
         }
@@ -111,10 +106,10 @@ abstract class ProtocolBaseTest extends BaseTest
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->getInstance()->validateOriginUri($uri);
+        self::getInstance()->validateOriginUri($uri);
     }
 
-    public function getValidOriginUris()
+    public static function getValidOriginUris(): array
     {
         return [
             ['http://www.example.org'],
@@ -123,7 +118,7 @@ abstract class ProtocolBaseTest extends BaseTest
         ];
     }
 
-    public function getInvalidOriginUris()
+    public static function getInvalidOriginUris(): array
     {
         return [
             [false],
@@ -133,7 +128,7 @@ abstract class ProtocolBaseTest extends BaseTest
         ];
     }
 
-    public function getValidHandshakeRequests()
+    public static function getValidHandshakeRequests(): array
     {
         $cases = [];
 
@@ -164,7 +159,7 @@ Sec-WebSocket-Version: 13\r
         return $cases;
     }
 
-    public function getValidHandshakeResponses()
+    public static function getValidHandshakeResponses(): array
     {
         $cases = [];
 

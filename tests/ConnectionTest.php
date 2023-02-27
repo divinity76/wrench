@@ -10,35 +10,12 @@ use Wrench\Socket\AbstractSocket;
 use Wrench\Socket\ServerClientSocket;
 use Wrench\Test\BaseTest;
 
-/**
- * Tests the Connection class.
- */
 class ConnectionTest extends BaseTest
 {
     /**
-     * Tests the constructor.
-     *
-     * @dataProvider getValidConstructorArguments
+     * @dataProvider getValidConstructorOptions
      */
-    public function testConstructor($manager, $socket, array $options)
-    {
-        $this->assertInstanceOfClass(
-            $instance = $this->getInstance(
-                $manager,
-                $socket,
-                $options
-            ),
-            'Valid constructor arguments'
-        );
-
-        return $instance;
-    }
-
-    /**
-     * @dataProvider getValidCloseCodes
-     * @doesNotPerformAssertions
-     */
-    public function testClose($code): void
+    public function testConstructor(array $options): void
     {
         $socket = $this->getMockSocket();
 
@@ -52,19 +29,45 @@ class ConnectionTest extends BaseTest
 
         $manager = $this->getMockConnectionManager();
 
-        $connection = $this->getInstance($manager, $socket);
+        $this->assertInstanceOfClass(
+            $instance = self::getInstance(
+                $manager,
+                $socket,
+                $options
+            ),
+            'Valid constructor arguments'
+        );
+    }
+
+    /**
+     * @dataProvider getValidCloseCodes
+     * @doesNotPerformAssertions
+     */
+    public function testClose(int $code): void
+    {
+        $socket = $this->getMockSocket();
+
+        $socket->expects($this->any())
+            ->method('getIp')
+            ->will($this->returnValue('127.0.0.1'));
+
+        $socket->expects($this->any())
+            ->method('getPort')
+            ->will($this->returnValue(\random_int(1025, 50000)));
+
+        $manager = $this->getMockConnectionManager();
+
+        $connection = self::getInstance($manager, $socket);
         $connection->close($code);
     }
 
     /**
-     * Gets a mock socket.
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject|AbstractSocket
+     * @return \PHPUnit_Framework_MockObject_MockObject&ServerClientSocket
      */
-    protected function getMockSocket()
+    private function getMockSocket(): ServerClientSocket
     {
         return $this->getMockBuilder(ServerClientSocket::class)
-            ->setMethods(['getIp', 'getPort', 'isConnected', 'send'])
+            ->onlyMethods(['getIp', 'getPort', 'isConnected', 'send'])
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -72,7 +75,7 @@ class ConnectionTest extends BaseTest
     /**
      * @dataProvider getValidHandshakeData
      */
-    public function testHandshake($path, $request)
+    public function testHandshake(string $path, string $request): void
     {
         $connection = $this->getConnectionForHandshake(
             $this->getConnectedSocket(),
@@ -83,18 +86,16 @@ class ConnectionTest extends BaseTest
         $connection->handshake($request);
 
         $headers = $connection->getHeaders();
-        $this->assertEquals(\array_change_key_case(['X-Some-Header' => 'Some Value']), $headers, 'Extra headers returned');
+        self::assertEquals(\array_change_key_case(['X-Some-Header' => 'Some Value']), $headers, 'Extra headers returned');
 
         $params = $connection->getQueryParams();
-        $this->assertEquals(['someparam' => 'someval'], $params, 'Query string parameters returned');
+        self::assertEquals(['someparam' => 'someval'], $params, 'Query string parameters returned');
 
         $connection->onData('somedata');
-        $this->assertTrue($connection->send('someotherdata'));
-
-        return $connection;
+        self::assertTrue($connection->send('someotherdata'));
     }
 
-    protected function getConnectionForHandshake($socket, $path, $request)
+    private function getConnectionForHandshake(ServerClientSocket $socket, string $path, string $request)
     {
         $manager = $this->getMockConnectionManager();
 
@@ -112,25 +113,23 @@ class ConnectionTest extends BaseTest
             ->method('getServer')
             ->will($this->returnValue($server));
 
-        $connection = $this->getInstance($manager, $socket);
+        $connection = self::getInstance($manager, $socket);
 
         return $connection;
     }
 
     /**
-     * Gets a mock application.
-     *
-     * @return \PHPUnit_Framework_MockObject_MockObject|DataHandlerInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject&DataHandlerInterface
      */
-    protected function getMockApplication()
+    private function getMockApplication(): DataHandlerInterface
     {
         return $this->createMock(DataHandlerInterface::class);
     }
 
     /**
-     * @return AbstractSocket|\PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject&ServerClientSocket
      */
-    protected function getConnectedSocket()
+    private function getConnectedSocket(): ServerClientSocket
     {
         $socket = $this->getMockSocket();
 
@@ -148,7 +147,7 @@ class ConnectionTest extends BaseTest
     /**
      * @dataProvider getValidHandshakeData
      */
-    public function testHandshakeBadSocket($path, $request): void
+    public function testHandshakeBadSocket(string $path, string $request): void
     {
         $connection = $this->getConnectionForHandshake(
             $this->getNotConnectedSocket(),
@@ -162,9 +161,9 @@ class ConnectionTest extends BaseTest
     }
 
     /**
-     * @return AbstractSocket
+     * @return \PHPUnit_Framework_MockObject_MockObject&ServerClientSocket
      */
-    protected function getNotConnectedSocket()
+    private function getNotConnectedSocket(): AbstractSocket
     {
         $socket = $this->getMockSocket();
 
@@ -176,11 +175,9 @@ class ConnectionTest extends BaseTest
     }
 
     /**
-     * Because expectation is that only $path application is available.
-     *
      * @dataProvider getWrongPathHandshakeData
      */
-    public function testWrongPathHandshake($path, $request): void
+    public function testWrongPathHandshake(string $path, string $request): void
     {
         $connection = $this->getConnectionForHandshake(
             $this->getConnectedSocket(),
@@ -188,6 +185,7 @@ class ConnectionTest extends BaseTest
             $request
         );
 
+        // expectation is that only $path application is available
         $this->expectException(ExpectationFailedException::class);
 
         $connection->handshake($request);
@@ -196,25 +194,23 @@ class ConnectionTest extends BaseTest
     /**
      * @dataProvider getValidHandleData
      */
-    public function testHandle($path, $request_handshake, array $requests, array $counts)
+    public function testHandle(string $path, string $handshake, array $requests, array $counts): void
     {
         $connection = $this->getConnectionForHandle(
             $this->getConnectedSocket(),
             $path,
-            $request_handshake,
+            $handshake,
             $counts
         );
 
-        $connection->handshake($request_handshake);
+        $connection->handshake($handshake);
 
         foreach ($requests as $request) {
             $connection->handle($request);
         }
-
-        return $connection;
     }
 
-    protected function getConnectionForHandle($socket, $path, $handshake, array $counts)
+    private function getConnectionForHandle(AbstractSocket $socket, string $path, string $handshake, array $counts): Connection
     {
         $connection = $this->getConnectionForHandshake($socket, $path, $handshake);
 
@@ -244,17 +240,15 @@ class ConnectionTest extends BaseTest
             ->method('getServer')
             ->will($this->returnValue($server));
 
-        $connection = $this->getInstance($manager, $socket);
+        $connection = self::getInstance($manager, $socket);
 
         return $connection;
     }
 
     /**
-     * Data provider.
-     *
      * @return array<array<int>>
      */
-    public function getValidCloseCodes()
+    public static function getValidCloseCodes(): array
     {
         $arguments = [];
         foreach (Protocol::CLOSE_REASONS as $code => $reason) {
@@ -265,52 +259,30 @@ class ConnectionTest extends BaseTest
     }
 
     /**
-     * Data provider.
-     *
      * @return array<array<mixed>>
      */
-    public function getValidConstructorArguments()
+    public static function getValidConstructorOptions(): array
     {
-        $socket = $this->getMockSocket();
-
-        $socket->expects($this->any())
-            ->method('getIp')
-            ->will($this->returnValue('127.0.0.1'));
-
-        $socket->expects($this->any())
-            ->method('getPort')
-            ->will($this->returnValue(\random_int(1025, 50000)));
-
-        $manager = $this->getMockConnectionManager();
-
         return [
             [
-                $manager,
-                $socket,
-                ['logger' => function (): void {
-                }],
+                [
+                    'logger' => function (): void {
+                    },
+                ],
             ],
             [
-                $manager,
-                $socket,
-                ['logger' => function (): void {
-                },
-                    'connection_id_algo' => 'sha512', ],
+                [
+                    'logger' => function (): void {
+                    },
+                    'connection_id_algo' => 'sha512',
+                ],
             ],
         ];
     }
 
-    /**
-     * Data provider.
-     *
-     * Uses this awkward valid request array so that splitting of payloads
-     * across multiple calls to handle can be tested
-     *
-     * testHandle($path, $request_handshake, array $requests, array $counts)
-     */
-    public function getValidHandleData()
+    public static function getValidHandleData(): array
     {
-        $valid_requests = [
+        $validRequests = [
             [
                 'data' => [
                     "\x81\xad\x2e\xab\x82\xac\x6f\xfe\xd6\xe4\x14\x8b\xf9\x8c\x0c"
@@ -339,13 +311,13 @@ class ConnectionTest extends BaseTest
 
         $data = [];
 
-        $handshakes = $this->getValidHandshakeData();
+        $handshakes = self::getValidHandshakeData();
 
         foreach ($handshakes as $handshake) {
-            foreach ($valid_requests as $handle_args) {
+            foreach ($validRequests as $handleArgs) {
                 $arguments = $handshake;
-                $arguments[] = $handle_args['data'];
-                $arguments[] = $handle_args['counts'];
+                $arguments[] = $handleArgs['data'];
+                $arguments[] = $handleArgs['counts'];
 
                 $data[] = $arguments;
             }
@@ -354,10 +326,7 @@ class ConnectionTest extends BaseTest
         return $data;
     }
 
-    /**
-     * Data provider.
-     */
-    public function getValidHandshakeData()
+    public static function getValidHandshakeData(): array
     {
         return [
             [
@@ -374,10 +343,7 @@ Sec-WebSocket-Version: 13\r\n\r\n",
         ];
     }
 
-    /**
-     * Data provider.
-     */
-    public function getWrongPathHandshakeData()
+    public static function getWrongPathHandshakeData(): array
     {
         return [
             [

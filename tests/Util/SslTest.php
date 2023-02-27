@@ -36,12 +36,12 @@ class SslTest extends BaseTest
             'nobody@example.com'
         );
 
-        $this->assertFileExists($this->tmp);
+        self::assertFileExists($this->tmp);
 
         $contents = \file_get_contents($this->tmp);
 
-        $this->assertMatchesRegularExpression('/BEGIN CERTIFICATE/', $contents, 'PEM file contains certificate');
-        $this->assertMatchesRegularExpression('/BEGIN ENCRYPTED PRIVATE KEY/', $contents, 'PEM file contains encrypted private key');
+        self::assertMatchesRegularExpression('/BEGIN CERTIFICATE/', $contents, 'PEM file contains certificate');
+        self::assertMatchesRegularExpression('/BEGIN ENCRYPTED PRIVATE KEY/', $contents, 'PEM file contains encrypted private key');
     }
 
     public function testGeneratePemWithoutPassphrase(): void
@@ -58,11 +58,11 @@ class SslTest extends BaseTest
             'nobody@example.com'
         );
 
-        $this->assertFileExists($this->tmp);
+        self::assertFileExists($this->tmp);
 
         $contents = \file_get_contents($this->tmp);
 
-        $this->assertMatchesRegularExpression('/BEGIN CERTIFICATE/', $contents, 'PEM file contains certificate');
-        $this->assertMatchesRegularExpression('/BEGIN PRIVATE KEY/', $contents, 'PEM file contains encrypted private key');
+        self::assertMatchesRegularExpression('/BEGIN CERTIFICATE/', $contents, 'PEM file contains certificate');
+        self::assertMatchesRegularExpression('/BEGIN PRIVATE KEY/', $contents, 'PEM file contains encrypted private key');
     }
 }

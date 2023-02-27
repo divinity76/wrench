@@ -6,21 +6,15 @@ use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use Wrench\ConnectionManager;
 
-/**
- * Test base class.
- */
 abstract class BaseTest extends TestCase
 {
     /**
      * Asserts that the given instance is of the class under test.
-     *
-     * @param object $instance
-     * @param string $message  Optional
      */
-    public function assertInstanceOfClass($instance, $message = null): void
+    protected function assertInstanceOfClass($instance, $message = null): void
     {
-        $this->assertInstanceOf(
-            $this->getClass(),
+        self::assertInstanceOf(
+            static::getClass(),
             $instance,
             $message ?? ''
         );
@@ -28,10 +22,8 @@ abstract class BaseTest extends TestCase
 
     /**
      * Gets the class under test.
-     *
-     * @return string
      */
-    protected function getClass()
+    protected static function getClass(): string
     {
         $class = static::class;
 
@@ -44,24 +36,18 @@ abstract class BaseTest extends TestCase
 
     /**
      * Gets an instance of the class under test.
-     *
-     * @magic This method accepts a variable number of arguments
-     *
-     * @param array $args
-     *
-     * @return static|object of type $this->getClass()
      */
-    public function getInstance(...$args)
+    protected static function getInstance(...$args): object
     {
-        $reflection = new ReflectionClass($this->getClass());
+        $reflection = new ReflectionClass(static::getClass());
 
         return $reflection->newInstanceArgs($args);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ConnectionManager
+     * @return \PHPUnit_Framework_MockObject_MockObject&ConnectionManager
      */
-    protected function getMockConnectionManager()
+    protected function getMockConnectionManager(): ConnectionManager
     {
         return $this->createMock(ConnectionManager::class);
     }

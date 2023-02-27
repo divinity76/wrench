@@ -5,17 +5,9 @@ namespace Wrench\Frame;
 use Wrench\Protocol\Protocol;
 use Wrench\Test\BaseTest;
 
-/**
- * Frame test.
- */
 abstract class FrameBaseTest extends BaseTest
 {
-    /**
-     * A fresh instance of the class being tested.
-     *
-     * @var Frame
-     */
-    protected $frame;
+    private Frame $frame;
 
     /**
      * @see PHPUnit_Framework_TestCase::setUp()
@@ -23,12 +15,12 @@ abstract class FrameBaseTest extends BaseTest
     public function setUp(): void
     {
         parent::setUp();
-        $this->frame = $this->getNewFrame();
+        $this->frame = self::getNewFrame();
     }
 
-    protected function getNewFrame()
+    private function getNewFrame(): Frame
     {
-        $class = $this->getClass();
+        $class = static::getClass();
 
         return new $class();
     }
@@ -43,54 +35,53 @@ abstract class FrameBaseTest extends BaseTest
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testBijection($type, $payload, $masked): void
+    public function testBijection(int $type, string $payload, bool $masked): void
     {
         // Encode the payload
         $this->frame->encode($payload, $type, $masked);
 
         // Get the resulting buffer
         $buffer = $this->frame->getFrameBuffer();
-        $this->assertTrue((bool) $buffer, 'Got raw frame buffer');
+        self::assertTrue((bool) $buffer, 'Got raw frame buffer');
 
         // And feed it back into a new frame
-        $frame = $this->getNewFrame();
+        $frame = self::getNewFrame();
         $frame->receiveData($buffer);
 
         // Check the properties of the new frame against the old, all match
-        $this->assertEquals(
+        self::assertEquals(
             $this->frame->getType(),
             $frame->getType(),
             'Types match after encode -> receiveData'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->frame->getFramePayload(),
             $frame->getFramePayload(),
             'Payloads match after encode -> receiveData'
         );
 
         // Masking key should not be different, because we read the buffer in directly
-        $this->assertEquals(
+        self::assertEquals(
             $this->frame->getFrameBuffer(),
             $frame->getFrameBuffer(),
             'Raw buffers match too'
         );
 
         // This time, we create a new frame and read the data in with encode
-        $frame = $this->getNewFrame();
+        $frame = self::getNewFrame();
         $frame->encode($this->frame->getFramePayload(), $type, $masked);
 
         // These still match
-        $this->assertEquals(
+        self::assertEquals(
             $this->frame->getType(),
             $frame->getType(),
             'Types match after encode -> receiveData -> encode'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->frame->getFramePayload(),
             $frame->getFramePayload(),
             'Payloads match after encode -> receiveData -> encode'
@@ -98,13 +89,13 @@ abstract class FrameBaseTest extends BaseTest
 
         // But the masking key should be different, thus, so are the buffers
         if ($masked) {
-            $this->assertNotEquals(
+            self::assertNotEquals(
                 $this->frame->getFrameBuffer(),
                 $frame->getFrameBuffer(),
                 'Raw buffers don\'t match because of masking'
             );
         } else {
-            $this->assertEquals(
+            self::assertEquals(
                 $this->frame->getFramePayload(),
                 $frame->getFramePayload(),
                 'Payloads match after encode -> receiveData -> encode'
@@ -113,41 +104,33 @@ abstract class FrameBaseTest extends BaseTest
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testEncodeTypeReflection($type, $payload, $masked): void
+    public function testEncodeTypeReflection(int $type, string $payload, bool $masked): void
     {
         $this->frame->encode($payload, $type);
-        $this->assertEquals(Protocol::TYPE_TEXT, $this->frame->getType(), 'Encode retains type information');
+        self::assertEquals(Protocol::TYPE_TEXT, $this->frame->getType(), 'Encode retains type information');
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testEncodeLengthReflection($type, $payload, $masked): void
+    public function testEncodeLengthReflection(int $type, string $payload, bool $masked): void
     {
         $this->frame->encode($payload, $type);
-        $this->assertEquals(\strlen($payload), $this->frame->getLength(), 'Encode does not alter payload length');
+        self::assertEquals(\strlen($payload), $this->frame->getLength(), 'Encode does not alter payload length');
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testEncodePayloadReflection($type, $payload, $masked): void
+    public function testEncodePayloadReflection(int $type, string $payload, bool $masked): void
     {
         $this->frame->encode($payload, $type, $masked);
-        $this->assertEquals($payload, $this->frame->getFramePayload(), 'Encode retains payload information');
+        self::assertEquals($payload, $this->frame->getFramePayload(), 'Encode retains payload information');
     }
 
-    /**
-     * Data provider.
-     *
-     * @return array<string>
-     */
-    public function getValidEncodePayloads()
+    public static function getValidEncodePayloads(): array
     {
         return [
             [

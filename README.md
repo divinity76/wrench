@@ -8,12 +8,14 @@ A simple PHP WebSocket implementation.
 
 ## Installation
 
-The library can be installed with Composer and is available on packagist under
+The library can be installed with Composer and is available on Packagist under
 [chrome-php/chrome](https://packagist.org/packages/chrome-php/wrench):
 
 ```bash
 $ composer require chrome-php/wrench
 ```
+
+PHP 7.4-8.2 are currently supported, only.
 
 
 ## Usage

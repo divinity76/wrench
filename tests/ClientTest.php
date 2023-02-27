@@ -10,23 +10,23 @@ use Wrench\Socket\ClientSocket;
 use Wrench\Test\BaseTest;
 use Wrench\Test\ServerTestHelper;
 
-/**
- * Tests the client class.
- */
 class ClientTest extends BaseTest
 {
     public function testConstructor(): void
     {
         $this->assertInstanceOfClass(
-            $client = new Client(
+            new Client(
                 'ws://localhost/test',
                 'http://example.org/'
             ),
             'ws:// scheme, default socket'
         );
+    }
 
+    public function testConstructorWithSocket(): void
+    {
         $this->assertInstanceOfClass(
-            $client = new Client(
+            new Client(
                 'ws://localhost/test',
                 'http://example.org/',
                 ['socket' => $this->getMockSocket()]
@@ -36,14 +36,12 @@ class ClientTest extends BaseTest
     }
 
     /**
-     * Gets a mock socket.
-     *
-     * @return \Wrench\Socket\Socket|\PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject&ClientSocket
      */
-    protected function getMockSocket()
+    private function getMockSocket(): ClientSocket
     {
         return $this->getMockBuilder(ClientSocket::class)
-            ->setMethods(null)
+            ->onlyMethods([])
             ->setConstructorArgs(['wss://localhost:8000'])
             ->getMock();
     }
@@ -89,45 +87,45 @@ class ClientTest extends BaseTest
             $helper = new ServerTestHelper();
             $helper->setUp();
 
-            /* @var $instance \Wrench\Client */
-            $instance = $this->getInstance($helper->getEchoConnectionString(), 'http://www.example.com/send');
+            /* @var \Wrench\Client */
+            $instance = self::getInstance($helper->getEchoConnectionString(), 'http://www.example.com/send');
             $instance->addRequestHeader('X-Test', 'Custom Request Header');
 
-            $this->assertNull($instance->receive(), 'Receive before connect');
+            self::assertNull($instance->receive(), 'Receive before connect');
 
             $success = $instance->connect();
-            $this->assertTrue($success, 'Client can connect to test server');
-            $this->assertTrue($instance->isConnected());
+            self::assertTrue($success, 'Client can connect to test server');
+            self::assertTrue($instance->isConnected());
 
-            $this->assertFalse($instance->connect(), 'Double connect');
+            self::assertFalse($instance->connect(), 'Double connect');
 
-            $this->assertSame([], $instance->receive(), 'No data');
+            self::assertSame([], $instance->receive(), 'No data');
 
             $bytes = $instance->sendData('foobar', Protocol::TYPE_TEXT);
-            $this->assertTrue($bytes >= 6, 'sent text frame');
+            self::assertTrue($bytes >= 6, 'sent text frame');
 
             $bytes = $instance->sendData('baz', Protocol::TYPE_TEXT);
-            $this->assertTrue($bytes >= 3, 'sent text frame');
+            self::assertTrue($bytes >= 3, 'sent text frame');
 
             \usleep(500000);
             $responses = $instance->receive();
-            $this->assertTrue(\is_array($responses));
-            $this->assertCount(2, $responses);
-            $this->assertInstanceOf(Payload::class, $responses[0]);
-            $this->assertInstanceOf(Payload::class, $responses[1]);
+            self::assertTrue(\is_array($responses));
+            self::assertCount(2, $responses);
+            self::assertInstanceOf(Payload::class, $responses[0]);
+            self::assertInstanceOf(Payload::class, $responses[1]);
 
             $bytes = $instance->sendData('baz', Protocol::TYPE_TEXT);
-            $this->assertTrue($bytes >= 3, 'sent text frame');
+            self::assertTrue($bytes >= 3, 'sent text frame');
 
             // test fix for issue #43
             $responses = $instance->receive();
-            $this->assertTrue(\is_array($responses));
-            $this->assertCount(1, $responses);
-            $this->assertInstanceOf(Payload::class, $responses[0]);
+            self::assertTrue(\is_array($responses));
+            self::assertCount(1, $responses);
+            self::assertInstanceOf(Payload::class, $responses[0]);
 
             $instance->disconnect();
 
-            $this->assertFalse($instance->isConnected());
+            self::assertFalse($instance->isConnected());
         } finally {
             $helper->tearDown();
         }

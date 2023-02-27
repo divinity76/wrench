@@ -2,6 +2,6 @@
 
 namespace Wrench\Socket;
 
-class ServerSocketTest extends UriSocketTest
+class ServerSocketTest extends UriSocketBaseTest
 {
 }

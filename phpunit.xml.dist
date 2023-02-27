@@ -1,25 +1,19 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<phpunit backupGlobals="false"
-         backupStaticAttributes="false"
-         beStrictAboutOutputDuringTests="true"
-         beStrictAboutTestsThatDoNotTestAnything="true"
-         bootstrap="vendor/autoload.php"
-         colors="true"
-         convertErrorsToExceptions="true"
-         convertNoticesToExceptions="true"
-         convertWarningsToExceptions="true"
-         processIsolation="false"
-         stopOnFailure="false"
-         verbose="true"
->
-    <testsuites>
-        <testsuite name="Test Suite">
-            <directory suffix="Test.php">./tests</directory>
-        </testsuite>
-    </testsuites>
-    <coverage processUncoveredFiles="true">
-        <include>
-            <directory suffix=".php">./src</directory>
-        </include>
-    </coverage>
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" backupGlobals="false" beStrictAboutOutputDuringTests="true" beStrictAboutTestsThatDoNotTestAnything="true" bootstrap="vendor/autoload.php" colors="true" processIsolation="false" stopOnFailure="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.0/phpunit.xsd">
+  <testsuites>
+    <testsuite name="Test Suite">
+      <directory suffix="Test.php">./tests</directory>
+      <exclude>./tests/Frame/FrameBaseTest.php</exclude>
+      <exclude>./tests/Payload/PayloadBaseTest.php</exclude>
+      <exclude>./tests/Protocol/ProtocolBaseTest.php</exclude>
+      <exclude>./tests/Socket/SocketBaseTest.php</exclude>
+      <exclude>./tests/Socket/UriSocketBaseTest.php</exclude>
+      <exclude>./tests/Test/BaseTest.php</exclude>
+    </testsuite>
+  </testsuites>
+  <coverage>
+    <include>
+      <directory suffix=".php">./src</directory>
+    </include>
+  </coverage>
 </phpunit>

@@ -10,7 +10,7 @@ use Psr\Log\NullLogger;
  * In conjunction with server.php, provides a listening server
  * against which tests can be run.
  */
-class ServerTestHelper implements LoggerAwareInterface
+final class ServerTestHelper implements LoggerAwareInterface
 {
     use LoggerAwareTrait;
 
@@ -19,9 +19,9 @@ class ServerTestHelper implements LoggerAwareInterface
 
     public static $nextPort = null;
 
-    protected $port = null;
-    protected $process = null;
-    protected $pipes = [];
+    private $port = null;
+    private $process = null;
+    private $pipes = [];
 
     public function __construct()
     {
@@ -132,7 +132,7 @@ class ServerTestHelper implements LoggerAwareInterface
     /**
      * Gets the server command.
      */
-    protected function getCommand(): string
+    private function getCommand(): string
     {
         return \sprintf('/usr/bin/env php %s/server.php %d', __DIR__, $this->port);
     }

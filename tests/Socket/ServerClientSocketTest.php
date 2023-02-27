@@ -6,33 +6,31 @@ use Wrench\Exception\SocketException;
 
 class ServerClientSocketTest extends SocketBaseTest
 {
-    /**
-     * By default, the socket has not required arguments.
-     */
-    public function testConstructor()
+    public function testConstructor(): void
     {
-        $instance = $this->getInstance(null);
-
+        $instance = self::getInstance(null);
         $this->assertInstanceOfClass($instance);
-
-        return $instance;
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testGetIpTooSoon($instance): void
+    public function testIsConnected(): void
     {
+        $instance = self::getInstance(null);
+        $connected = $instance->isConnected();
+        self::assertTrue(\is_bool($connected), 'isConnected returns boolean');
+        self::assertFalse($connected);
+    }
+
+    public function testGetIpTooSoon(): void
+    {
+        $instance = self::getInstance(null);
         $this->expectException(SocketException::class);
 
         $instance->getIp();
     }
 
-    /**
-     * @depends testConstructor
-     */
-    public function testGetPortTooSoon($instance): void
+    public function testGetPortTooSoon(): void
     {
+        $instance = self::getInstance(null);
         $this->expectException(SocketException::class);
 
         $instance->getPort();

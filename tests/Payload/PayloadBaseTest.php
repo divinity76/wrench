@@ -6,17 +6,9 @@ use Wrench\Protocol\Protocol;
 use Wrench\Socket\ClientSocket;
 use Wrench\Test\BaseTest;
 
-/**
- * Payload test.
- */
 abstract class PayloadBaseTest extends BaseTest
 {
-    /**
-     * A fresh instance of the class being tested.
-     *
-     * @var Payload
-     */
-    protected $payload;
+    private Payload $payload;
 
     /**
      * @see PHPUnit_Payloadwork_TestCase::setUp()
@@ -25,38 +17,34 @@ abstract class PayloadBaseTest extends BaseTest
     {
         parent::setUp();
 
-        $this->payload = $this->getInstance();
+        $this->payload = self::getInstance();
     }
 
-    /**
-     * Tests the constructor.
-     */
     public function testConstructor(): void
     {
-        $this->assertInstanceOfClass($this->getInstance());
+        $this->assertInstanceOfClass(self::getInstance());
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testBijection($type, $payload): void
+    public function testBijection(int $type, string $payload): void
     {
         // Encode the payload
         $this->payload->encode($payload, $type);
 
         // Create a new payload and read the data in with encode
-        $payload = $this->getInstance();
+        $payload = self::getInstance();
         $payload->encode($this->payload->getPayload(), $type);
 
         // These still match
-        $this->assertEquals(
+        self::assertEquals(
             $this->payload->getType(),
             $payload->getType(),
             'Types match after encode -> receiveData'
         );
 
-        $this->assertEquals(
+        self::assertEquals(
             $this->payload->getPayload(),
             $payload->getPayload(),
             'Payloads match after encode -> receiveData'
@@ -64,39 +52,35 @@ abstract class PayloadBaseTest extends BaseTest
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testEncodeTypeReflection($type, $payload): void
+    public function testEncodeTypeReflection(int $type, string $payload): void
     {
         $this->payload->encode($payload, Protocol::TYPE_TEXT);
-        $this->assertEquals(Protocol::TYPE_TEXT, $this->payload->getType(), 'Encode retains type information');
+        self::assertEquals(Protocol::TYPE_TEXT, $this->payload->getType(), 'Encode retains type information');
     }
 
     /**
-     * @param string $payload
      * @dataProvider getValidEncodePayloads
      */
-    public function testEncodePayloadReflection($type, $payload): void
+    public function testEncodePayloadReflection(int $type, string $payload): void
     {
         $this->payload->encode($payload, Protocol::TYPE_TEXT);
-        $this->assertEquals($payload, $this->payload->getPayload(), 'Encode retains payload information');
+        self::assertEquals($payload, $this->payload->getPayload(), 'Encode retains payload information');
     }
 
     /**
-     * Tests sending to a socket.
-     *
      * @dataProvider getValidEncodePayloads
      */
-    public function testSendToSocket($type, $payload): void
+    public function testSendToSocket(int $type, string $payload): void
     {
         $socket = $this->getMockBuilder(ClientSocket::class)
-            ->setMethods(['getIp', 'getPort', 'isConnected', 'send'])
+            ->onlyMethods(['getIp', 'getPort', 'isConnected', 'send'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $failedSocket = $this->getMockBuilder(ClientSocket::class)
-            ->setMethods(['getIp', 'getPort', 'isConnected', 'send'])
+            ->onlyMethods(['getIp', 'getPort', 'isConnected', 'send'])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -110,28 +94,21 @@ abstract class PayloadBaseTest extends BaseTest
 
         $this->payload->encode($payload, $type);
 
-        $this->assertTrue($this->payload->sendToSocket($socket));
-        $this->assertFalse($this->payload->sendToSocket($failedSocket));
+        self::assertTrue($this->payload->sendToSocket($socket));
+        self::assertFalse($this->payload->sendToSocket($failedSocket));
     }
 
     /**
-     * Tests receiving data.
-     *
      * @dataProvider getValidEncodePayloads
      * @doesNotPerformAssertions
      */
-    public function testReceieveData($type, $payload): void
+    public function testReceieveData(int $type, string $payload): void
     {
-        $payload = $this->getInstance();
+        $payload = self::getInstance();
         $payload->receiveData($payload);
     }
 
-    /**
-     * Data provider.
-     *
-     * @return array<string>
-     */
-    public function getValidEncodePayloads()
+    public static function getValidEncodePayloads(): array
     {
         return [
             [
@@ -143,7 +120,10 @@ abstract class PayloadBaseTest extends BaseTest
                 Protocol::TYPE_TEXT,
                 \pack('CCCCCCC', 0x00, 0x01, 0x02, 0x03, 0x04, 0xFF, 0xF0),
             ],
-            [Protocol::TYPE_TEXT, ' '],
+            [
+                Protocol::TYPE_TEXT,
+                ' ',
+            ],
         ];
     }
 }

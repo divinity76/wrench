@@ -3,38 +3,42 @@
 namespace Wrench\Listener;
 
 use Wrench\Connection;
+use Wrench\Server;
+use Wrench\Test\BaseTest;
 
-class OriginPolicyTest extends ListenerBaseTest
+class OriginPolicyTest extends BaseTest
 {
-    public function testConstructor()
+    public function testConstructor(): void
     {
-        $instance = $this->getInstance([]);
+        $instance = self::getInstance([]);
         $this->assertInstanceOfClass($instance, 'No constructor arguments');
+    }
 
-        return $instance;
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testListen(): void
+    {
+        $instance = self::getInstance([]);
+        $server = $this->createMock(Server::class);
+        $instance->listen($server);
     }
 
     /**
      * @dataProvider getValidArguments
-     *
-     * @param array  $allowed
-     * @param string $domain
      */
-    public function testValidAllowed($allowed, $domain): void
+    public function testValidAllowed(array $allowed, string $domain): void
     {
-        $instance = $this->getInstance($allowed);
-        $this->assertTrue($instance->isAllowed($domain));
+        $instance = self::getInstance($allowed);
+        self::assertTrue($instance->isAllowed($domain));
     }
 
     /**
      * @dataProvider getValidArguments
-     *
-     * @param array  $allowed
-     * @param string $domain
      */
-    public function testValidHandshake($allowed, $domain): void
+    public function testValidHandshake(array $allowed, string $domain): void
     {
-        $instance = $this->getInstance($allowed);
+        $instance = self::getInstance($allowed);
 
         $connection = $this->createMock(Connection::class);
 
@@ -49,23 +53,20 @@ class OriginPolicyTest extends ListenerBaseTest
      * @dataProvider getInvalidArguments
      *
      * @param array  $allowed
-     * @param string $bad_domain
+     * @param string $badDomain
      */
-    public function testInvalidAllowed($allowed, $bad_domain): void
+    public function testInvalidAllowed(array $allowed, string $badDomain): void
     {
-        $instance = $this->getInstance($allowed);
-        $this->assertFalse($instance->isAllowed($bad_domain));
+        $instance = self::getInstance($allowed);
+        self::assertFalse($instance->isAllowed($badDomain));
     }
 
     /**
      * @dataProvider getInvalidArguments
-     *
-     * @param array  $allowed
-     * @param string $bad_domain
      */
-    public function testInvalidHandshake($allowed, $bad_domain): void
+    public function testInvalidHandshake(array $allowed, string $badDomain): void
     {
-        $instance = $this->getInstance($allowed);
+        $instance = self::getInstance($allowed);
 
         $connection = $this->createMock(Connection::class);
 
@@ -73,13 +74,10 @@ class OriginPolicyTest extends ListenerBaseTest
             ->expects($this->once())
             ->method('close');
 
-        $instance->onHandshakeRequest($connection, '/', $bad_domain, 'abc', []);
+        $instance->onHandshakeRequest($connection, '/', $badDomain, 'abc', []);
     }
 
-    /**
-     * Data provider.
-     */
-    public function getValidArguments()
+    public static function getValidArguments(): array
     {
         return [
             [['localhost'], 'http://localhost'],
@@ -88,10 +86,7 @@ class OriginPolicyTest extends ListenerBaseTest
         ];
     }
 
-    /**
-     * Data provider.
-     */
-    public function getInvalidArguments()
+    public static function getInvalidArguments(): array
     {
         return [
             [['localhost'], 'localdomain'],
