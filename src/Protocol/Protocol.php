@@ -458,10 +458,10 @@ abstract class Protocol
 
         $statusCode = $this->getStatusCode($response);
 
-        if (101 !== $statusCode) {
+        if (self::HTTP_SWITCHING_PROTOCOLS !== $statusCode) {
             $errorMessage = \explode("\n", \trim($this->getBody($response)), 2)[0];
 
-            throw new HandshakeException(\trim(\sprintf('Expected handshake response status code 101, but received %d. %s', $statusCode, $errorMessage)));
+            throw new HandshakeException(\trim(\sprintf('Expected handshake response status code %d, but received %d. %s', self::HTTP_SWITCHING_PROTOCOLS, $statusCode, $errorMessage)));
         }
 
         $acceptHeaderValue = $this->getHeaders($response)[self::HEADER_ACCEPT] ?? '';
