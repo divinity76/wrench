@@ -478,7 +478,7 @@ abstract class Protocol
      *
      * If there is no status line, we return 0.
      *
-     * @return array<string, array>
+     * @return int
      */
     protected function getStatusCode(string $response): int
     {
