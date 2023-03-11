@@ -1,6 +1,13 @@
 # CHANGELOG
 
 
+## 1.5.0 (2023-03-XX)
+
+* Made response header parsing more robust
+* Improve the handshake exception message
+* Use `random_bytes` to generate handshake keys
+
+
 ## 1.4.0 (2023-02-27)
 
 * Dropped PHP 7.3 support
