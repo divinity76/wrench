@@ -458,10 +458,10 @@ abstract class Protocol
 
         $statusCode = $this->getStatusCode($response);
 
-        if ($statusCode !== 101) {
-            $errorMessage = explode("\n", trim($this->getBody($response)), 2)[0];
+        if (101 !== $statusCode) {
+            $errorMessage = \explode("\n", \trim($this->getBody($response)), 2)[0];
 
-            throw new HandshakeException(trim(sprintf('Expected handshake response status code 101, but received %d. %s', $statusCode, $errorMessage)));
+            throw new HandshakeException(\trim(\sprintf('Expected handshake response status code 101, but received %d. %s', $statusCode, $errorMessage)));
         }
 
         $acceptHeaderValue = $this->getHeaders($response)[self::HEADER_ACCEPT] ?? '';
@@ -510,12 +510,12 @@ abstract class Protocol
             if (2 == \count($parts)) {
                 [$name, $value] = $parts;
                 if (!isset($return[$name])) {
-                    $return[$name] = trim($value);
+                    $return[$name] = \trim($value);
                 } else {
                     if (\is_array($return[$name])) {
-                        $return[$name][] = trim($value);
+                        $return[$name][] = \trim($value);
                     } else {
-                        $return[$name] = [$return[$name], trim($value)];
+                        $return[$name] = [$return[$name], \trim($value)];
                     }
                 }
             }
