@@ -165,7 +165,7 @@ Sec-WebSocket-Version: 13\r
 
         for ($i = 10; $i > 0; --$i) {
             $key = \sha1(\time().\uniqid('', true));
-            $response = 'Sec-WebSocket-Accept: '
+            $response = "HTTP/1.1 101 WebSocket Protocol Handshake\r\nUpgrade: WebSocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: "
                 .\base64_encode(\sha1($key.'258EAFA5-E914-47DA-95CA-C5AB0DC85B11', true))
                 ."\r\n\r\n";
 
