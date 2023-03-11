@@ -375,7 +375,7 @@ abstract class Protocol
      *
      * @return string[]
      */
-    protected function getSuccessResponseHeaders($key)
+    protected function getSuccessResponseHeaders(string $key): array
     {
         return [
             self::HEADER_UPGRADE => self::UPGRADE_VALUE,
@@ -391,13 +391,13 @@ abstract class Protocol
      *
      * @see https://datatracker.ietf.org/doc/html/rfc6455#section-4.2.2
      *
-     * @param string $encoded_key
+     * @param string $key
      *
      * @return string
      */
-    protected function getAcceptValue($encoded_key)
+    protected function getAcceptValue(string $key): string
     {
-        return \base64_encode(\sha1($encoded_key.self::MAGIC_GUID, true));
+        return \base64_encode(\sha1($key.self::MAGIC_GUID, true));
     }
 
     /**
@@ -430,7 +430,7 @@ abstract class Protocol
      *
      * @return string
      */
-    public function getResponseError($e, array $headers = [])
+    public function getResponseError($e, array $headers = []): string
     {
         $code = false;
 
@@ -473,7 +473,14 @@ abstract class Protocol
         return $this->getEncodedHash($key) === $acceptHeaderValue;
     }
 
-    protected function getStatusCode(string $response)
+    /**
+     * Gets the status code from a full response.
+     *
+     * If there is no status line, we return 0.
+     *
+     * @return array<string, array>
+     */
+    protected function getStatusCode(string $response): int
     {
         [$statusLine] = \explode("\r\n", $response, 2);
 
@@ -487,7 +494,7 @@ abstract class Protocol
      *
      * @return array<string, array>
      */
-    protected function getHeaders(string $response)
+    protected function getHeaders(string $response): array
     {
         $parts = \explode("\r\n\r\n", $response, 2);
 
@@ -517,7 +524,12 @@ abstract class Protocol
         return \array_change_key_case($return);
     }
 
-    protected function getBody(string $response)
+    /**
+     * Gets the body from a full response.
+     *
+     * @return string
+     */
+    protected function getBody(string $response): string
     {
         return \explode("\r\n\r\n", $response, 2)[1] ?? '';
     }
@@ -529,7 +541,7 @@ abstract class Protocol
      *
      * @return string
      */
-    public function getEncodedHash($key)
+    public function getEncodedHash(string $key): string
     {
         return \base64_encode(\pack('H*', \sha1($key.self::MAGIC_GUID)));
     }
@@ -633,7 +645,7 @@ abstract class Protocol
      *
      * @throws InvalidArgumentException
      */
-    protected function getRequestHeaders(string $response)
+    protected function getRequestHeaders(string $response): array
     {
         $eol = \stripos($response, "\r\n");
 
