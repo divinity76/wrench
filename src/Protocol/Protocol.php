@@ -463,24 +463,30 @@ abstract class Protocol
             return false;
         }
 
-        $headers = $this->getHeaders($response);
+        $statusCode = $this->getStatusCode($response);
 
-        if (!isset($headers[self::HEADER_ACCEPT])) {
-            throw new HandshakeException('No accept header receieved on handshake response');
+        if ($statusCode !== 101) {
+            $errorMessage = explode("\n", trim($this->getBody($response)), 2)[0];
+
+            throw new HandshakeException(trim(sprintf('Expected handshake response status code 101, but received %d. %s', $statusCode, $errorMessage)));
         }
 
-        $accept = $headers[self::HEADER_ACCEPT];
+        $acceptHeaderValue = $this->getHeaders($response)[self::HEADER_ACCEPT] ?? '';
 
-        if (!$accept) {
-            throw new HandshakeException('Invalid accept header');
+        if ('' === $acceptHeaderValue) {
+            throw new HandshakeException('No accept header received on handshake response');
         }
 
-        $expected = $this->getAcceptValue($key);
+        return $this->getEncodedHash($key) === $acceptHeaderValue;
+    }
 
-        \preg_match('#Sec-WebSocket-Accept:\s(.*)$#imU', $response, $matches);
-        $keyAccept = \trim($matches[1]);
+    protected function getStatusCode(string $response)
+    {
+        [$statusLine] = \explode("\r\n", $response, 2);
 
-        return $keyAccept === $this->getEncodedHash($key);
+        [$protocol, $statusCode] = \explode(' ', $response, 2);
+
+        return (int) $statusCode;
     }
 
     /**
@@ -500,22 +506,27 @@ abstract class Protocol
 
         $return = [];
         foreach (\explode("\r\n", $headers) as $header) {
-            $parts = \explode(': ', $header, 2);
+            $parts = \explode(':', $header, 2);
             if (2 == \count($parts)) {
                 [$name, $value] = $parts;
                 if (!isset($return[$name])) {
-                    $return[$name] = $value;
+                    $return[$name] = trim($value);
                 } else {
                     if (\is_array($return[$name])) {
-                        $return[$name][] = $value;
+                        $return[$name][] = trim($value);
                     } else {
-                        $return[$name] = [$return[$name], $value];
+                        $return[$name] = [$return[$name], trim($value)];
                     }
                 }
             }
         }
 
         return \array_change_key_case($return);
+    }
+
+    protected function getBody(string $response)
+    {
+        return \explode("\r\n\r\n", $response, 2)[1] ?? '';
     }
 
     /**
