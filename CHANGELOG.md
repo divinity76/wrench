@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## 1.5.0 (2023-03-XX)
+## 1.5.0 (2023-03-11)
 
 * Made response header parsing more robust
 * Improve the handshake exception message
