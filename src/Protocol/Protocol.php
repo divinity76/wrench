@@ -187,14 +187,7 @@ abstract class Protocol
      */
     public function generateKey(): string
     {
-        if (\extension_loaded('openssl')) {
-            $key = \openssl_random_pseudo_bytes(16);
-        } else {
-            // SHA1 is 128 bit (= 16 bytes)
-            $key = \sha1(\spl_object_hash($this).\mt_rand(0, \PHP_INT_MAX).\uniqid('', true), true);
-        }
-
-        return \base64_encode($key);
+        return \base64_encode(\random_bytes(16));
     }
 
     /**
