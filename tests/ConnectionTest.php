@@ -41,6 +41,7 @@ class ConnectionTest extends BaseTest
 
     /**
      * @dataProvider getValidCloseCodes
+     *
      * @doesNotPerformAssertions
      */
     public function testClose(int $code): void

@@ -88,6 +88,7 @@ abstract class ProtocolBaseTest extends BaseTest
 
     /**
      * @dataProvider getValidOriginUris
+     *
      * @doesNotPerformAssertions
      */
     public function testValidateOriginUriValid(string $uri): void
