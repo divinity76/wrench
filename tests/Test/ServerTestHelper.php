@@ -111,9 +111,11 @@ final class ServerTestHelper implements LoggerAwareInterface
                 2 => ['file', $directory.'/server.err.log', 'a+'],
             ],
             $this->pipes,
-            __DIR__.'../'
+            __DIR__.'/../'
         );
-
+        if($this->process === false){
+            throw new \RuntimeException("proc_open failed: " . var_export(error_get_last(), true));
+        }
         \sleep(3);
     }
 
