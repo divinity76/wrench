@@ -40,7 +40,7 @@ if($sock === false) {
 } else {
     echo "socket_create() OK" . PHP_EOL;
 }
-if(1){
+if(0){
     $bind = socket_bind($sock, '0.0.0.0');
 if($bind === false) {
     echo "socket_bind() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
@@ -50,13 +50,11 @@ if($bind === false) {
      }
 socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 3, 'usec' => 0]);
 socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 3, 'usec' => 0]);
-socket_set_option($sock, SOL_SOCKET, SO_REUSEADDR, 1);
-socket_set_option($sock, SOL_SOCKET, SO_REUSEPORT, 1);
 
 $uri = $this->getUri();
 $uridata = parse_url($uri);
 var_dump($uridata);
-$uridata['host'] = '127.0.0.1';
+//$uridata['host'] = '127.0.0.1';
         $t = microtime(true);
 $connect = socket_connect($sock, $uridata['host'], $uridata['port']);
         $t = microtime(true) - $t;
@@ -82,12 +80,14 @@ $this->socket = @\stream_socket_client(
     if($this->socket !== false){
         break;
     }
+    break;
     if($attempts >= 9){
         throw new \RuntimeException('Failed to connect to ' . $this->getUri() . ' after ' . $attempts . ' attempts');
     }
     time_sleep_until(microtime(true) + 0.1);
 }
         var_dump([
+                 "default_socket_timeout" => ini_get("default_socket_timeout"),
                  "getUri"=> $this->getUri(),
                  "errno" => $errno,
                  "errstr" => $errstr,
