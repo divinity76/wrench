@@ -29,7 +29,9 @@ class ClientSocket extends UriSocket
         if ($this->isConnected()) {
             return true;
         }
-
+if(PHP_VERSION_ID >= 80300){
+    sleep(3);
+}
         $errno = null;
         $errstr = null;
 $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
