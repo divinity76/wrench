@@ -29,6 +29,7 @@ class ServerSocket extends UriSocket
     public function listen(): void
     {
         var_dump("STREAM_SOCKET_SERVER uri",$this->getUri());
+        throw new Exception("wut");
         $this->socket = \stream_socket_server(
             $this->getUri(),
             $errno,
