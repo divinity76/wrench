@@ -111,7 +111,7 @@ final class ServerTestHelper implements LoggerAwareInterface
                 2 => ['file', $hans, 'a+'],
             ],
             $this->pipes,
-            __DIR__.'../'
+            __DIR__.'/../'
         );
         \sleep(3);
         \ob_start();
