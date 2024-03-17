@@ -95,6 +95,7 @@ $this->socket = @\stream_socket_client(
                  "errstr" => $errstr,
                  "getStreamContext" => $this->getStreamContext(),
                  "stream_get_transports" => \stream_get_transports(),
+                 "/tmp/stream_socket_server.txt" => file_get_contents(sys_get_temp_dir()."/stream_socket_server.txt")
         ]);
         sleep(10);
         if (!$this->socket) {
