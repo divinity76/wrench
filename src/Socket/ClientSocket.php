@@ -32,6 +32,7 @@ class ClientSocket extends UriSocket
 
         $errno = null;
         $errstr = null;
+        sleep(3);
 $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 if($sock === false) {
     echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . PHP_EOL;
