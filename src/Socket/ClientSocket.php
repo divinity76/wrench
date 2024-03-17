@@ -48,6 +48,8 @@ if($bind === false) {
      }
 socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 3, 'usec' => 0]);
 socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 3, 'usec' => 0]);
+socket_set_option($sock, SOL_SOCKET, SO_REUSEADDR, 1);
+socket_set_option($sock, SOL_SOCKET, SO_REUSEPORT, 1);
 
 $uri = $this->getUri();
 $uridata = parse_url($uri);
