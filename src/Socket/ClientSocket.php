@@ -42,7 +42,12 @@ class ClientSocket extends UriSocket
             \STREAM_CLIENT_CONNECT,
             $this->getStreamContext()
         );
-
+        var_dump([
+                 "getUri"=> $this->getUri(),
+                 "errno" => $errno,
+                 "errstr" => $errstr,
+                 "getStreamContext" => $this->getStreamContext()
+        ]);
         if (!$this->socket) {
             throw new \Wrench\Exception\ConnectionException(\sprintf('Could not connect to socket: %s (%d)', $errstr, $errno));
         }
