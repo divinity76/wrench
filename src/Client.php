@@ -227,6 +227,7 @@ class Client extends Configurable
         try {
             $this->socket->connect();
         } catch (\Exception $ex) {
+            var_dump($ex);
             var_dump(__FILE__.":".__LINE__);
             return false;
         }
