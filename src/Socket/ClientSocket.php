@@ -66,14 +66,24 @@ if($connect === false) {
 }
 socket_close($sock);
         // Supress PHP error, we're handling it
-        $this->socket = @\stream_socket_client(
-            $this->getUri(),
-            $errno,
-            $errstr,
-            $this->options['timeout_connect'],
-            \STREAM_CLIENT_CONNECT,
-            $this->getStreamContext()
-        );
+$attempts = 0;
+for(;;){
+    ++$attempts;
+$this->socket = @\stream_socket_client(
+    $this->getUri(),
+    $errno,
+    $errstr,
+    $this->options['timeout_connect'],
+    \STREAM_CLIENT_CONNECT,
+    $this->getStreamContext()
+);
+    if($this->socket !== false){
+        break;
+    }
+    if($attempts >= 9){
+        throw new \RuntimeException('Failed to connect to ' . $this->getUri() . ' after ' . $attempts . ' attempts');
+    }
+}
         var_dump([
                  "getUri"=> $this->getUri(),
                  "errno" => $errno,
