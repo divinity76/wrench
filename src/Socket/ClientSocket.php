@@ -32,6 +32,28 @@ class ClientSocket extends UriSocket
 
         $errno = null;
         $errstr = null;
+$sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+if($sock === false) {
+    echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . PHP_EOL;
+} else {
+    echo "socket_create() OK" . PHP_EOL;
+}
+$bind = socket_bind($sock, '127.0.0.1');
+if($bind === false) {
+    echo "socket_bind() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
+} else {
+    echo "socket_bind() OK" . PHP_EOL;
+}
+$uri = $this->getUri();
+$uridata = parse_url($uri);
+var_dump($uridata);
+$connect = socket_connect($sock, $uridata['host'], $uridata['port']);
+if($connect === false) {
+    echo "socket_connect() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
+} else {
+    echo "socket_connect() OK" . PHP_EOL;
+}
+socket_close($sock);
 
         // Supress PHP error, we're handling it
         $this->socket = @\stream_socket_client(
