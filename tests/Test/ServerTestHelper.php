@@ -134,6 +134,6 @@ final class ServerTestHelper implements LoggerAwareInterface
      */
     private function getCommand(): string
     {
-        return \sprintf('/usr/bin/env php ' . escapeshellarg(__DIR__ . '/server.php') . ' %d', $this->port);
+        return \sprintf('/usr/bin/env php '.\escapeshellarg(__DIR__.'/server.php').' %d', $this->port);
     }
 }
