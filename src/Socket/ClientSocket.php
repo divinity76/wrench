@@ -87,6 +87,7 @@ $this->socket = @\stream_socket_client(
     time_sleep_until(microtime(true) + 0.1);
 }
         var_dump([
+                 "options[timeout_connect]" => $this->options['timeout_connect'],
                  "default_socket_timeout" => ini_get("default_socket_timeout"),
                  "getUri"=> $this->getUri(),
                  "errno" => $errno,
