@@ -134,6 +134,8 @@ final class ServerTestHelper implements LoggerAwareInterface
      */
     private function getCommand(): string
     {
-        return \sprintf('/usr/bin/env php %s/server.php %d', __DIR__, $this->port);
+        $ret = \sprintf('/usr/bin/env php %s/server.php %d', __DIR__, $this->port);
+        file_put_contents(sys_get_temp_dir()."/stream_socket_server.txt", "getCommand: $ret\n", FILE_APPEND);
+        return $ret;
     }
 }
