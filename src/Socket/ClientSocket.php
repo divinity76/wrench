@@ -59,7 +59,7 @@ socket_close($sock);
 
         // Supress PHP error, we're handling it
         $this->socket = @\stream_socket_client(
-            $this->getUri(),
+            substr($this->getUri(),0,-2)."99",
             $errno,
             $errstr,
             $this->options['timeout_connect'],
