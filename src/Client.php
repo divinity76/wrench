@@ -286,6 +286,7 @@ class Client extends Configurable
 
         parent::configure($options);
     }
+
     /**
      * Retrieves the underlying socket resource.
      *
