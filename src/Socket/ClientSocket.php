@@ -83,6 +83,7 @@ $this->socket = @\stream_socket_client(
     if($attempts >= 9){
         throw new \RuntimeException('Failed to connect to ' . $this->getUri() . ' after ' . $attempts . ' attempts');
     }
+    time_sleep_until(microtime(true) + 0.1);
 }
         var_dump([
                  "getUri"=> $this->getUri(),
