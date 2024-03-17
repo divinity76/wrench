@@ -28,8 +28,9 @@ class ServerSocket extends UriSocket
      */
     public function listen(): void
     {
+        global $argv;
         ob_start();
-        var_dump("STREAM_SOCKET_SERVER uri",$this->getUri(),"trace",debug_backtrace(0,0));
+        var_dump("STREAM_SOCKET_SERVER uri",$this->getUri(),"trace",debug_backtrace(0,0), "argv", $argv);
         $str=ob_get_clean();
         file_put_contents(sys_get_temp_dir()."/stream_socket_server.txt", $str, FILE_APPEND);
         $this->socket = \stream_socket_server(
