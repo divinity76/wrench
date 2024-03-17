@@ -40,8 +40,9 @@ if($sock === false) {
 } else {
     echo "socket_create() OK" . PHP_EOL;
 }
-if(0){
-    $bind = socket_bind($sock, '0.0.0.0');
+var_dump(shell_exec("curl --connect-timeout 1 -v http://localhost/ 2>&1"));
+if(1){
+    $bind = socket_bind($sock, '0', 0);
 if($bind === false) {
     echo "socket_bind() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
 } else {
@@ -54,7 +55,7 @@ socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 3, 'usec' => 0]);
 $uri = $this->getUri();
 $uridata = parse_url($uri);
 var_dump($uridata);
-//$uridata['host'] = '127.0.0.1';
+$uridata['host'] = '127.0.0.1';
         $t = microtime(true);
 $connect = socket_connect($sock, $uridata['host'], $uridata['port']);
         $t = microtime(true) - $t;
