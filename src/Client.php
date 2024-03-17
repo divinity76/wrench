@@ -218,13 +218,16 @@ class Client extends Configurable
      */
     public function connect(): bool
     {
+        var_dump(__METHOD__);
         if ($this->isConnected()) {
+            var_dump(__FILE__.":".__LINE__);
             return false;
         }
 
         try {
             $this->socket->connect();
         } catch (\Exception $ex) {
+            var_dump(__FILE__.":".__LINE__);
             return false;
         }
 
