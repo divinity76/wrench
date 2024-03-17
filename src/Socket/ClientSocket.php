@@ -49,6 +49,7 @@ class ClientSocket extends UriSocket
                  "getStreamContext" => $this->getStreamContext(),
                  "stream_get_transports" => \stream_get_transports(),
         ]);
+        sleep(10);
         if (!$this->socket) {
             throw new \Wrench\Exception\ConnectionException(\sprintf('Could not connect to socket: %s (%d)', $errstr, $errno));
         }
