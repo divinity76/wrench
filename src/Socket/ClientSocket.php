@@ -32,6 +32,8 @@ class ClientSocket extends UriSocket
 if(PHP_VERSION_ID >= 80300){
     sleep(3);
 }
+$uri = $this->getUri();
+$uridata = parse_url($uri);
         $errno = null;
         $errstr = null;
 $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
@@ -40,7 +42,7 @@ if($sock === false) {
 } else {
     echo "socket_create() OK" . PHP_EOL;
 }
-var_dump(shell_exec("curl --connect-timeout 1 -v http://localhost/ 2>&1"));
+var_dump(shell_exec("curl --connect-timeout 1 --max-time 2 -v http://localhost:". ($uridata['port']) ." 2>&1"));
 if(1){
     $bind = socket_bind($sock, '0', 0);
 if($bind === false) {
@@ -52,8 +54,6 @@ if($bind === false) {
 socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 3, 'usec' => 0]);
 socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 3, 'usec' => 0]);
 
-$uri = $this->getUri();
-$uridata = parse_url($uri);
 var_dump($uridata);
 $uridata['host'] = '127.0.0.1';
         $t = microtime(true);
