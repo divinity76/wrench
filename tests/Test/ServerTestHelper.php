@@ -102,19 +102,23 @@ final class ServerTestHelper implements LoggerAwareInterface
 
         $directory = \sprintf('%s/%s', \sys_get_temp_dir(), \bin2hex(\random_bytes(16)));
         \mkdir($directory);
-
+        $hans=sys_get_temp_dir()."/stream_socket_server.txt";
         $this->process = \proc_open(
             $this->getCommand(),
             [
                 0 => ['file', '/dev/null', 'r'],
-                1 => ['file', $directory.'/server.log', 'a+'],
-                2 => ['file', $directory.'/server.err.log', 'a+'],
+                1 => ['file', $hans, 'a+'],
+                2 => ['file', $hans, 'a+'],
             ],
             $this->pipes,
             __DIR__.'../'
         );
-
         \sleep(3);
+        \ob_start();
+        \var_dump(\proc_get_status($this->process));
+        $str = ob_get_clean();
+                file_put_contents(sys_get_temp_dir()."/stream_socket_server.txt", "proc_get_status: $str\n", FILE_APPEND);
+
     }
 
     /**
@@ -134,7 +138,7 @@ final class ServerTestHelper implements LoggerAwareInterface
      */
     private function getCommand(): string
     {
-        $ret = \sprintf('/usr/bin/env php %s/server.php %d 2>&1 | tee -a ' . sys_get_temp_dir()."/stream_socket_server.txt", __DIR__, $this->port);
+        $ret = \sprintf('/usr/bin/env php %s/server.php %d', __DIR__, $this->port);
         file_put_contents(sys_get_temp_dir()."/stream_socket_server.txt", "getCommand: $ret\n", FILE_APPEND);
         return $ret;
     }
