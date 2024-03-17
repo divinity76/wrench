@@ -96,7 +96,7 @@ $this->socket = @\stream_socket_client(
                  "getStreamContext" => $this->getStreamContext(),
                  "stream_get_transports" => \stream_get_transports(),
                  "/tmp/stream_socket_server.txt" => file_get_contents(sys_get_temp_dir()."/stream_socket_server.txt"),
-                 "/usr/bin/env php" => shell_exec("/usr/bin/env php"),
+                 "/usr/bin/env php -v 2>&1" => shell_exec("/usr/bin/env php -v 2>&1"),
         ]);
         sleep(10);
         if (!$this->socket) {
