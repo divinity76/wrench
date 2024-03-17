@@ -227,9 +227,8 @@ class Client extends Configurable
         try {
             $this->socket->connect();
         } catch (\Exception $ex) {
-            throw $ex;
             var_dump(__FILE__.":".__LINE__);
-            return false;
+            throw $ex;
         }
 
         $key = $this->protocol->generateKey();
