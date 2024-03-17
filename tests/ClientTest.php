@@ -92,8 +92,10 @@ class ClientTest extends BaseTest
             $instance->addRequestHeader('X-Test', 'Custom Request Header');
 
             self::assertNull($instance->receive(), 'Receive before connect');
-
             $success = $instance->connect();
+            var_dump(
+                $instance,
+                $success);
             self::assertTrue($success, 'Client can connect to test server');
             self::assertTrue($instance->isConnected());
 
