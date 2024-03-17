@@ -39,7 +39,7 @@ if($sock === false) {
 } else {
     echo "socket_create() OK" . PHP_EOL;
 }
-$bind = socket_bind($sock, '127.0.0.1');
+$bind = socket_bind($sock, '0.0.0.0');
 if($bind === false) {
     echo "socket_bind() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
 } else {
