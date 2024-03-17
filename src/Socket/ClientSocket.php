@@ -53,7 +53,10 @@ $uri = $this->getUri();
 $uridata = parse_url($uri);
 var_dump($uridata);
 $uridata['host'] = '127.0.0.1';
+        $t = microtime(true);
 $connect = socket_connect($sock, $uridata['host'], $uridata['port']);
+        $t = microtime(true) - $t;
+echo "socket_connect time: $t\n";
 if($connect === false) {
     echo "socket_connect() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
 } else {
