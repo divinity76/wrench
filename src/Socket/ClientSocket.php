@@ -38,7 +38,7 @@ if($sock === false) {
 } else {
     echo "socket_create() OK" . PHP_EOL;
 }
-if(0){
+if(1){
     $bind = socket_bind($sock, '0.0.0.0');
 if($bind === false) {
     echo "socket_bind() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
@@ -46,6 +46,9 @@ if($bind === false) {
     echo "socket_bind() OK" . PHP_EOL;
 }
      }
+socket_set_option($sock, SOL_SOCKET, SO_RCVTIMEO, ['sec' => 3, 'usec' => 0]);
+socket_set_option($sock, SOL_SOCKET, SO_SNDTIMEO, ['sec' => 3, 'usec' => 0]);
+
 $uri = $this->getUri();
 $uridata = parse_url($uri);
 var_dump($uridata);
