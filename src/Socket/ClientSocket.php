@@ -32,19 +32,20 @@ class ClientSocket extends UriSocket
 
         $errno = null;
         $errstr = null;
-        sleep(3);
 $sock = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 if($sock === false) {
     echo "socket_create() failed: reason: " . socket_strerror(socket_last_error()) . PHP_EOL;
 } else {
     echo "socket_create() OK" . PHP_EOL;
 }
-$bind = socket_bind($sock, '0.0.0.0');
+if(0){
+    $bind = socket_bind($sock, '0.0.0.0');
 if($bind === false) {
     echo "socket_bind() failed: reason: " . socket_strerror(socket_last_error($sock)) . PHP_EOL;
 } else {
     echo "socket_bind() OK" . PHP_EOL;
 }
+     }
 $uri = $this->getUri();
 $uridata = parse_url($uri);
 var_dump($uridata);
@@ -56,10 +57,9 @@ if($connect === false) {
     echo "socket_connect() OK" . PHP_EOL;
 }
 socket_close($sock);
-
         // Supress PHP error, we're handling it
         $this->socket = @\stream_socket_client(
-            substr($this->getUri(),0,-2)."99",
+            $this->getUri(),
             $errno,
             $errstr,
             $this->options['timeout_connect'],
