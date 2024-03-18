@@ -301,7 +301,7 @@ class Client extends Configurable
         $except = null;
         $seconds = (int) \floor($maxSeconds);
         $microseconds = (int) (($maxSeconds - $seconds) * 1e6);
-        $result = \socket_select($read, $write, $except, $seconds, $microseconds);
+        $result = \stream_select($read, $write, $except, $seconds, $microseconds);
         if (false === $result) {
             $errorcode = \socket_last_error($this->socket->getResource());
             $errormsg = \socket_strerror($errorcode);
