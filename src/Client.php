@@ -292,9 +292,9 @@ class Client extends Configurable
      *
      * @param float $maxSeconds the maximum amount of time to wait for data, in seconds
      *
-     * @return bool returns true if data is available, false if the wait timed out
+     * @return ?bool Returns true if data is available, false if the wait timed out, and null on error.
      */
-    public function waitForData(float $maxSeconds): bool
+    public function waitForData(float $maxSeconds): ?bool
     {
         $read = [$this->socket->getResource()];
         $write = null;
@@ -303,9 +303,8 @@ class Client extends Configurable
         $microseconds = (int) (($maxSeconds - $seconds) * 1e6);
         $result = \stream_select($read, $write, $except, $seconds, $microseconds);
         if (false === $result) {
-            $errorcode = \socket_last_error($this->socket->getResource());
-            $errormsg = \socket_strerror($errorcode);
-            throw new \RuntimeException("socket_select error $errorcode: $errormsg");
+            // An error occurred. stream_select() probably triggered an error internally.
+            return null;
         } elseif (0 === $result) {
             // Timeout occurred, no data available
             return false;
