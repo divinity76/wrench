@@ -288,15 +288,6 @@ class Client extends Configurable
     }
 
     /**
-     * Retrieves the underlying socket resource.
-     *
-     * @return resource The socket resource
-     */
-    public function getSocketResource()
-    {
-        return $this->socket->getResource();
-    }
-    /**
      * Waits for data to become available on the socket.
      *
      * @param float $maxSeconds The maximum amount of time to wait for data, in seconds.
