@@ -303,8 +303,9 @@ class Client extends Configurable
         $microseconds = (int) (($maxSeconds - $seconds) * 1e6);
         $result = \socket_select($read, $write, $except, $seconds, $microseconds);
         if (false === $result) {
-            // An error occurred
-            throw new \RuntimeException('Error occurred during socket_select.');
+            $errorcode = \socket_last_error($this->socket->getResource());
+            $errormsg = \socket_strerror($errorcode);
+            throw new \RuntimeException("socket_select error $errorcode: $errormsg");
         } elseif (0 === $result) {
             // Timeout occurred, no data available
             return false;
