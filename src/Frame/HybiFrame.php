@@ -73,10 +73,10 @@ class HybiFrame extends Frame
             throw new InvalidArgumentException('Invalid frame type');
         }
 
-        $this->type    = $type;
-        $this->masked  = $masked;
+        $this->type = $type;
+        $this->masked = $masked;
         $this->payload = $payload;
-        $this->length  = \strlen($this->payload);
+        $this->length = \strlen($this->payload);
 
         $this->buffer = "\x00\x00";
 
@@ -113,7 +113,7 @@ class HybiFrame extends Frame
         }
 
         if ($this->masked) {
-            $this->mask   = $this->generateMask();
+            $this->mask = $this->generateMask();
             $this->offset_mask = \strlen($this->buffer);
             $this->buffer .= $this->mask;
             $this->offset_payload = \strlen($this->buffer);
@@ -122,6 +122,7 @@ class HybiFrame extends Frame
             $this->offset_payload = \strlen($this->buffer);
             $this->buffer .= $this->payload;
         }
+
         return $this;
     }
 
@@ -193,6 +194,7 @@ class HybiFrame extends Frame
             $offset += $this->getLengthSize();
             $this->offset_mask = $offset;
         }
+
         return $this->offset_mask;
     }
 
@@ -226,6 +228,7 @@ class HybiFrame extends Frame
         if (!isset($this->buffer[self::BYTE_INITIAL_LENGTH])) {
             throw new FrameException('Cannot yet tell expected length');
         }
+
         return (int) (\ord($this->buffer[self::BYTE_INITIAL_LENGTH]) & self::BITFIELD_INITIAL_LENGTH);
     }
 
@@ -251,6 +254,7 @@ class HybiFrame extends Frame
             $offset += $this->getMaskSize();
             $this->offset_payload = $offset;
         }
+
         return $this->offset_payload;
     }
 
