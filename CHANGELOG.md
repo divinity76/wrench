@@ -1,6 +1,12 @@
 # CHANGELOG
 
 
+## 1.7.1 (2025-05-01)
+
+* Fix size 65536 HybiFrames
+* Use `random_bytes` function to generate masks
+
+
 ## 1.7.0 (2024-11-06)
 
 * Add `Client::getSocketResource` method
