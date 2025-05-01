@@ -42,7 +42,7 @@ Wrench\Util\Ssl::generatePEMFile(
 );
 
 // User can use tls in place of ssl
-$server = new \Wrench\Server('wss://127.0.0.1:8000/', [
+$server = new Wrench\Server('wss://127.0.0.1:8000/', [
     'connection_manager_options' => [
         'socket_master_options' => [
             'server_ssl_local_cert' => $pemFile,
@@ -56,7 +56,7 @@ $server = new \Wrench\Server('wss://127.0.0.1:8000/', [
 /**
  * Our example application, that just echoes the received data.
  */
-$app = new class() implements \Wrench\Application\DataHandlerInterface {
+$app = new class() implements Wrench\Application\DataHandlerInterface {
     public function onData(string $data, Wrench\Connection $connection): void
     {
         $connection->send($data);
@@ -64,6 +64,6 @@ $app = new class() implements \Wrench\Application\DataHandlerInterface {
 };
 
 $server->registerApplication('echo', $app);
-$server->registerApplication('status', new \Wrench\Application\StatusApplication());
+$server->registerApplication('status', new Wrench\Application\StatusApplication());
 
 $server->run();

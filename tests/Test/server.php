@@ -10,7 +10,7 @@ $port = (int) $argv[1];
 
 $server = new Wrench\Server('ws://localhost:'.$port);
 
-$app = new class() implements \Wrench\Application\DataHandlerInterface {
+$app = new class() implements Wrench\Application\DataHandlerInterface {
     public function onData(string $data, Wrench\Connection $connection): void
     {
         $connection->send($data);
