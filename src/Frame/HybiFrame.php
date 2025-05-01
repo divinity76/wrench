@@ -133,7 +133,13 @@ class HybiFrame extends Frame
      */
     protected function generateMask()
     {
-        return \random_bytes(4);
+        if (\extension_loaded('openssl')) {
+            return \openssl_random_pseudo_bytes(4);
+        } else {
+            // SHA1 is 128 bit (= 16 bytes)
+            // So we pack it into 32 bits
+            return \pack('N', \sha1(\spl_object_hash($this).\mt_rand(0, \PHP_INT_MAX).\uniqid('', true), true));
+        }
     }
 
     /**
