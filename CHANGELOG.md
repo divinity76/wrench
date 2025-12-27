@@ -1,7 +1,7 @@
 # CHANGELOG
 
 
-## 1.8.0 (UPCOMING)
+## 1.8.0 (2025-12-27)
 
 * Add support for PHP 8.5
 
