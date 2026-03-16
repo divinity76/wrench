@@ -58,7 +58,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
 
     /**
      * Whether we have ran fread() on the socket at least once.
-     * 
+     *
      * @var bool
      */
     private $hasBeenFreadInitialized = false;
@@ -259,7 +259,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
                     // > 0 means there is data to read
                     || $selectResult > 0
                     // false means we were unable to check if there is data to read, it does not mean there is no data to read.
-                    || $selectResult === false
+                    || false === $selectResult
                 ) {
                     $result = \fread($this->socket, $length);
                     $this->hasBeenFreadInitialized = true;
