@@ -254,7 +254,7 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
                 $exceptArray = null;
                 $selectResult = @\stream_select($readArray, $writeArray, $exceptArray, 0);
                 if (
-                    // before the first fread(), stream_select() is unreliable (observed on PHP8.4.12 Ubuntu24.04)
+                    // before the first fread(), stream_select() is unreliable (observed on PHP8.4.12 Ubuntu24.04 chrome-php/wrench1.8.0)
                     !$this->hasBeenFreadInitialized
                     // > 0 means there is data to read
                     || $selectResult > 0
