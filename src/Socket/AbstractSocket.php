@@ -57,6 +57,13 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
     protected $name;
 
     /**
+     * Whether we have ran fread() on the socket at least once.
+     * 
+     * @var bool
+     */
+    private $hasBeenFreadInitialized = false;
+
+    /**
      * Gets the IP address of the socket.
      *
      * @throws \Wrench\Exception\SocketException If the IP address cannot be obtained
@@ -242,9 +249,23 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
 
                     return $buffer;
                 }
-
-                $result = \fread($this->socket, $length);
-
+                $readArray = [$this->socket];
+                $writeArray = null;
+                $exceptArray = null;
+                $selectResult = @\stream_select($readArray, $writeArray, $exceptArray, 0);
+                if (
+                    // before the first fread(), stream_select() is unreliable (observed on Ubuntu24.04)
+                    !$this->hasBeenFreadInitialized
+                    // > 0 means there is data to read
+                    || $selectResult > 0
+                    // false means we were unable to check if there is data to read, it does not mean there is no data to read.
+                    || $selectResult === false
+                ) {
+                    $result = \fread($this->socket, $length);
+                    $this->hasBeenFreadInitialized = true;
+                } else {
+                    $result = false;
+                }
                 if ($makeBlockingAfterRead) {
                     \stream_set_blocking($this->socket, true);
                     $makeBlockingAfterRead = false;
