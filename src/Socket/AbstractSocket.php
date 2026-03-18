@@ -249,23 +249,24 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
 
                     return $buffer;
                 }
-                $readArray = [$this->socket];
-                $writeArray = null;
-                $exceptArray = null;
-                $selectResult = @\stream_select($readArray, $writeArray, $exceptArray, 0);
-                if (
-                    // before the first fread(), stream_select() may erroneously return 0 (observed on PHP8.4.12 Ubuntu24.04 chrome-php/wrench1.8.0)
-                    !$this->hasBeenFreadInitialized
-                    // > 0 means there is data to read
-                    || $selectResult > 0
-                    // false means we were unable to check if there is data to read, it does not mean there is no data to read.
-                    || false === $selectResult
-                ) {
-                    $result = \fread($this->socket, $length);
+                if (!$this->hasBeenFreadInitialized) {
+                    // stream_select() may erroneously return 0 before the first fread() (observed on PHP8.4.12 Ubuntu24.04 chrome-php/wrench1.8.0)
+                    $this->hasBeenFreadInitialized = true;
+                    $selectResult                  = 1;
+                } else {
+                    $readArray    = [$this->socket];
+                    $writeArray   = null;
+                    $exceptArray  = null;
+                    $selectResult = \stream_select($readArray, $writeArray, $exceptArray, 0);
+                }
+                // 1 means there is data to read, false means we were unable to check if there is data to read
+                if ($selectResult === 1 || $selectResult === false) {
+                    $result                        = \fread($this->socket, $length);
                     $this->hasBeenFreadInitialized = true;
                 } else {
                     $result = false;
                 }
+
                 if ($makeBlockingAfterRead) {
                     \stream_set_blocking($this->socket, true);
                     $makeBlockingAfterRead = false;
