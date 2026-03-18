@@ -262,7 +262,6 @@ abstract class AbstractSocket extends Configurable implements ResourceInterface
                 // 1 means there is data to read, false means we were unable to check if there is data to read
                 if (1 === $selectResult || false === $selectResult) {
                     $result = \fread($this->socket, $length);
-                    $this->hasBeenFreadInitialized = true;
                 } else {
                     $result = false;
                 }
